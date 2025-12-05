@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Store, UtensilsCrossed, ArrowLeft } from "lucide-react";
+import { Store, UtensilsCrossed, ArrowLeft, Filter, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getTheme, ThemeConfig } from "@/lib/menu-themes";
-import { getAllergenInfo } from "@/components/AllergenSelector";
+import { getAllergenInfo, EU_ALLERGENS } from "@/components/AllergenSelector";
 
 interface Restaurant {
   id: string;
@@ -52,6 +52,34 @@ const PublicMenu = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [theme, setTheme] = useState<ThemeConfig>(getTheme('default'));
+  const [excludedAllergens, setExcludedAllergens] = useState<string[]>([]);
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+
+  // Get all unique allergens used in this menu
+  const availableAllergens = useMemo(() => {
+    const allergenSet = new Set<string>();
+    menuItems.forEach(item => {
+      item.allergens?.forEach(a => allergenSet.add(a));
+    });
+    return Array.from(allergenSet).sort();
+  }, [menuItems]);
+
+  // Filter menu items based on excluded allergens
+  const filteredMenuItems = useMemo(() => {
+    if (excludedAllergens.length === 0) return menuItems;
+    return menuItems.filter(item => {
+      if (!item.allergens || item.allergens.length === 0) return true;
+      return !item.allergens.some(a => excludedAllergens.includes(a));
+    });
+  }, [menuItems, excludedAllergens]);
+
+  const toggleAllergen = (allergen: string) => {
+    setExcludedAllergens(prev => 
+      prev.includes(allergen) 
+        ? prev.filter(a => a !== allergen)
+        : [...prev, allergen]
+    );
+  };
 
   useEffect(() => {
     fetchMenu();
@@ -179,6 +207,67 @@ const PublicMenu = () => {
 
       {/* Menu */}
       <main className="container mx-auto px-4 py-8 max-w-2xl">
+        {/* Allergen Filter */}
+        {availableAllergens.length > 0 && (
+          <div className="mb-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilterPanel(!showFilterPanel)}
+              className="mb-3"
+            >
+              <Filter className="mr-2 h-4 w-4" />
+              Filter op allergenen
+              {excludedAllergens.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {excludedAllergens.length}
+                </Badge>
+              )}
+            </Button>
+            
+            {showFilterPanel && (
+              <Card className={`p-4 ${theme.cardBg} ${theme.borderStyle}`}>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Verberg gerechten met deze allergenen:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableAllergens.map((allergen) => {
+                      const info = getAllergenInfo(allergen);
+                      const isExcluded = excludedAllergens.includes(allergen);
+                      return (
+                        <button
+                          key={allergen}
+                          onClick={() => toggleAllergen(allergen)}
+                          className={`flex items-center gap-1 px-2 py-1.5 text-xs rounded-md border transition-colors ${
+                            isExcluded
+                              ? "bg-destructive text-destructive-foreground border-destructive"
+                              : "bg-background border-border hover:bg-muted"
+                          }`}
+                        >
+                          <span>{info.emoji}</span>
+                          <span>{info.label}</span>
+                          {isExcluded && <X className="h-3 w-3 ml-1" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {excludedAllergens.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setExcludedAllergens([])}
+                      className="text-xs"
+                    >
+                      Wis alle filters
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
+
         {categories.length === 0 ? (
           <Card className={`text-center py-12 ${theme.cardBg} ${theme.borderStyle}`}>
             <CardContent>
@@ -191,7 +280,7 @@ const PublicMenu = () => {
         ) : (
           <div className="space-y-8">
             {categories.map((category) => {
-              const categoryItems = menuItems.filter(
+              const categoryItems = filteredMenuItems.filter(
                 (item) => item.category_id === category.id
               );
 
