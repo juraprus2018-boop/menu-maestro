@@ -4,11 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Store, UtensilsCrossed, ArrowLeft, Filter, X } from "lucide-react";
+import { Store, UtensilsCrossed, ArrowLeft, Filter, X, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getTheme, ThemeConfig } from "@/lib/menu-themes";
 import { getAllergenInfo } from "@/components/AllergenSelector";
 import LanguageSelector from "@/components/LanguageSelector";
+import { useCart } from "@/hooks/useCart";
+import { CartDrawer } from "@/components/ordering/CartDrawer";
+import { CheckoutForm } from "@/components/ordering/CheckoutForm";
+import { toast } from "sonner";
 
 interface Restaurant {
   id: string;
@@ -52,6 +56,19 @@ interface Translation {
   translation_text: string;
 }
 
+interface OrderingSettings {
+  is_ordering_enabled: boolean;
+  accepts_pickup: boolean;
+  accepts_delivery: boolean;
+  accepts_cash: boolean;
+  accepts_card: boolean;
+  accepts_ideal: boolean;
+  delivery_fee: number | null;
+  minimum_order_amount: number | null;
+  estimated_pickup_time: number | null;
+  estimated_delivery_time: number | null;
+}
+
 const PublicMenu = () => {
   const { slug, menuId } = useParams();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
@@ -65,6 +82,11 @@ const PublicMenu = () => {
   const [excludedAllergens, setExcludedAllergens] = useState<string[]>([]);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState("nl");
+  const [orderingSettings, setOrderingSettings] = useState<OrderingSettings | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  const cart = useCart();
 
   // Get translation helper
   const getTranslation = (entityType: string, entityId: string, fieldName: string, fallback: string) => {
@@ -102,6 +124,21 @@ const PublicMenu = () => {
     );
   };
 
+  const handleAddToCart = (item: MenuItem) => {
+    if (item.price === null) return;
+    cart.addItem(item.id, item.name, item.price);
+    toast.success(`${item.name} toegevoegd aan winkelwagen`);
+  };
+
+  const handleCheckout = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const handleOrderComplete = () => {
+    cart.clearCart();
+  };
+
   useEffect(() => {
     fetchMenu();
   }, [slug, menuId]);
@@ -129,6 +166,17 @@ const PublicMenu = () => {
 
     setRestaurant(restaurantData);
     setTheme(getTheme(restaurantData.theme));
+
+    // Fetch ordering settings
+    const { data: orderingData } = await supabase
+      .from("restaurant_ordering_settings")
+      .select("*")
+      .eq("restaurant_id", restaurantData.id)
+      .maybeSingle();
+
+    if (orderingData) {
+      setOrderingSettings(orderingData);
+    }
 
     // Fetch menu
     const { data: menuData, error: menuError } = await supabase
@@ -189,6 +237,9 @@ const PublicMenu = () => {
 
     setTranslations(data || []);
   };
+
+  const isOrderingEnabled = orderingSettings?.is_ordering_enabled && 
+    (orderingSettings.accepts_pickup || orderingSettings.accepts_delivery);
 
   if (loading) {
     return (
@@ -268,6 +319,15 @@ const PublicMenu = () => {
           </div>
         </div>
       </header>
+
+      {/* Ordering Banner */}
+      {isOrderingEnabled && (
+        <div className="bg-primary text-primary-foreground py-3 text-center">
+          <p className="text-sm font-medium">
+            🛒 Online bestellen is beschikbaar! Voeg items toe aan je winkelwagen.
+          </p>
+        </div>
+      )}
 
       {/* Menu */}
       <main className="container mx-auto px-4 py-8 max-w-2xl">
@@ -388,11 +448,23 @@ const PublicMenu = () => {
                               </div>
                             )}
                           </div>
-                          {item.price !== null && (
-                            <span className={`text-base font-medium whitespace-nowrap ${theme.priceStyle}`}>
-                              €{item.price.toFixed(2)}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {item.price !== null && (
+                              <span className={`text-base font-medium whitespace-nowrap ${theme.priceStyle}`}>
+                                €{item.price.toFixed(2)}
+                              </span>
+                            )}
+                            {isOrderingEnabled && item.price !== null && (
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                className="h-8 w-8 shrink-0"
+                                onClick={() => handleAddToCart(item)}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -418,6 +490,33 @@ const PublicMenu = () => {
           </p>
         </footer>
       </main>
+
+      {/* Cart Drawer */}
+      {isOrderingEnabled && orderingSettings && (
+        <>
+          <CartDrawer
+            items={cart.items}
+            subtotal={cart.subtotal}
+            totalItems={cart.totalItems}
+            onUpdateQuantity={cart.updateQuantity}
+            onRemoveItem={cart.removeItem}
+            onUpdateNotes={cart.updateNotes}
+            onCheckout={handleCheckout}
+            minimumOrderAmount={orderingSettings.minimum_order_amount || 0}
+            isOpen={isCartOpen}
+            onOpenChange={setIsCartOpen}
+          />
+          <CheckoutForm
+            isOpen={isCheckoutOpen}
+            onClose={() => setIsCheckoutOpen(false)}
+            items={cart.items}
+            subtotal={cart.subtotal}
+            restaurantId={restaurant?.id || ""}
+            orderingSettings={orderingSettings}
+            onOrderComplete={handleOrderComplete}
+          />
+        </>
+      )}
     </div>
   );
 };
