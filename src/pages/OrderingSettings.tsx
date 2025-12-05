@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { OpeningHoursEditor, OpeningHours, defaultOpeningHours } from "@/components/OpeningHoursEditor";
+import { Json } from "@/integrations/supabase/types";
 
 interface OrderingSettings {
   id?: string;
@@ -22,6 +24,7 @@ interface OrderingSettings {
   accepts_cash: boolean;
   accepts_card: boolean;
   accepts_ideal: boolean;
+  opening_hours: OpeningHours;
 }
 
 const OrderingSettings = () => {
@@ -42,6 +45,7 @@ const OrderingSettings = () => {
     accepts_cash: true,
     accepts_card: true,
     accepts_ideal: true,
+    opening_hours: defaultOpeningHours,
   });
 
   useEffect(() => {
@@ -61,7 +65,10 @@ const OrderingSettings = () => {
       if (error) throw error;
 
       if (data) {
-        setSettings(data);
+        setSettings({
+          ...data,
+          opening_hours: (data.opening_hours as unknown as OpeningHours) || defaultOpeningHours,
+        });
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -73,16 +80,21 @@ const OrderingSettings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const dataToSave = {
+        ...settings,
+        opening_hours: settings.opening_hours as unknown as Json,
+      };
+
       if (settings.id) {
         const { error } = await supabase
           .from("restaurant_ordering_settings")
-          .update(settings)
+          .update(dataToSave)
           .eq("id", settings.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("restaurant_ordering_settings")
-          .insert(settings);
+          .insert(dataToSave);
         if (error) throw error;
       }
 
@@ -141,6 +153,19 @@ const OrderingSettings = () => {
                 onCheckedChange={(checked) => setSettings({ ...settings, is_ordering_enabled: checked })}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Openingstijden</CardTitle>
+            <CardDescription>Bestellingen worden alleen geaccepteerd tijdens openingstijden</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <OpeningHoursEditor
+              value={settings.opening_hours}
+              onChange={(opening_hours) => setSettings({ ...settings, opening_hours })}
+            />
           </CardContent>
         </Card>
 
