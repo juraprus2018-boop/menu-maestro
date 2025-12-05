@@ -25,7 +25,7 @@ interface MenuItem {
   id: string;
   name: string;
   description: string | null;
-  price: number;
+  price: number | null;
   is_available: boolean;
   category_id: string;
   sort_order: number;
@@ -178,9 +178,11 @@ const PublicMenu = () => {
                               </p>
                             )}
                           </div>
-                          <Badge variant="secondary" className="text-base font-semibold whitespace-nowrap">
-                            €{item.price.toFixed(2)}
-                          </Badge>
+                          {item.price !== null && (
+                            <Badge variant="secondary" className="text-base font-semibold whitespace-nowrap">
+                              €{item.price.toFixed(2)}
+                            </Badge>
+                          )}
                         </div>
                         {index < categoryItems.length - 1 && (
                           <Separator className="opacity-50" />

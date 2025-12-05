@@ -58,7 +58,7 @@ export type Database = {
           image_url: string | null
           is_available: boolean
           name: string
-          price: number
+          price: number | null
           sort_order: number
         }
         Insert: {
@@ -69,7 +69,7 @@ export type Database = {
           image_url?: string | null
           is_available?: boolean
           name: string
-          price: number
+          price?: number | null
           sort_order?: number
         }
         Update: {
@@ -80,7 +80,7 @@ export type Database = {
           image_url?: string | null
           is_available?: boolean
           name?: string
-          price?: number
+          price?: number | null
           sort_order?: number
         }
         Relationships: [
