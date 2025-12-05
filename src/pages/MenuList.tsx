@@ -8,12 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Edit2, Trash2, QrCode, Settings, Eye, Menu } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, Trash2, QrCode, Settings, Eye, Menu, Globe } from "lucide-react";
+import TranslationManager from "@/components/TranslationManager";
 
 interface Restaurant {
   id: string;
   name: string;
   slug: string;
+  enabled_languages: string[];
 }
 
 interface MenuType {
@@ -38,6 +40,17 @@ const MenuList = () => {
   const [menuName, setMenuName] = useState("");
   const [menuDescription, setMenuDescription] = useState("");
 
+  // Translation dialog
+  const [translationDialogOpen, setTranslationDialogOpen] = useState(false);
+  const [translationTarget, setTranslationTarget] = useState<MenuType | null>(null);
+
+  const hasMultipleLanguages = restaurant?.enabled_languages && restaurant.enabled_languages.filter(l => l !== "nl").length > 0;
+
+  const openTranslationDialog = (menu: MenuType) => {
+    setTranslationTarget(menu);
+    setTranslationDialogOpen(true);
+  };
+
   useEffect(() => {
     fetchData();
   }, [restaurantId]);
@@ -47,7 +60,7 @@ const MenuList = () => {
 
     const { data: restaurantData, error: restaurantError } = await supabase
       .from("restaurants")
-      .select("id, name, slug")
+      .select("id, name, slug, enabled_languages")
       .eq("id", restaurantId)
       .single();
 
@@ -222,6 +235,16 @@ const MenuList = () => {
                       )}
                     </div>
                     <div className="flex gap-2">
+                      {hasMultipleLanguages && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openTranslationDialog(menu)}
+                          title="Vertalingen"
+                        >
+                          <Globe className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -294,6 +317,28 @@ const MenuList = () => {
                 <Button onClick={saveMenu}>Opslaan</Button>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Translation Dialog */}
+        <Dialog open={translationDialogOpen} onOpenChange={setTranslationDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="font-serif">Vertalingen</DialogTitle>
+            </DialogHeader>
+            {translationTarget && restaurant && (
+              <TranslationManager
+                entityType="menu"
+                entityId={translationTarget.id}
+                entityName={translationTarget.name}
+                fields={[
+                  { name: "name", label: "Naam", originalValue: translationTarget.name },
+                  { name: "description", label: "Beschrijving", multiline: true, originalValue: translationTarget.description || "" },
+                ]}
+                enabledLanguages={restaurant.enabled_languages}
+                onClose={() => setTranslationDialogOpen(false)}
+              />
+            )}
           </DialogContent>
         </Dialog>
       </main>

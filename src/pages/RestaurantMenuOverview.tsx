@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Store, UtensilsCrossed, ChevronRight } from "lucide-react";
 import { getTheme, ThemeConfig } from "@/lib/menu-themes";
+import LanguageSelector from "@/components/LanguageSelector";
 
 interface Restaurant {
   id: string;
@@ -12,6 +13,7 @@ interface Restaurant {
   intro_text: string | null;
   slug: string;
   theme: string | null;
+  enabled_languages: string[];
 }
 
 interface MenuType {
@@ -21,6 +23,12 @@ interface MenuType {
   is_active: boolean;
 }
 
+interface Translation {
+  entity_id: string;
+  field_name: string;
+  translation_text: string;
+}
+
 const RestaurantMenuOverview = () => {
   const { slug } = useParams();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
@@ -28,10 +36,18 @@ const RestaurantMenuOverview = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [theme, setTheme] = useState<ThemeConfig>(getTheme('default'));
+  const [selectedLanguage, setSelectedLanguage] = useState("nl");
+  const [translations, setTranslations] = useState<Translation[]>([]);
 
   useEffect(() => {
     fetchData();
   }, [slug]);
+
+  useEffect(() => {
+    if (restaurant && selectedLanguage !== "nl") {
+      fetchTranslations();
+    }
+  }, [selectedLanguage, restaurant]);
 
   const fetchData = async () => {
     // Fetch restaurant by slug
@@ -62,6 +78,30 @@ const RestaurantMenuOverview = () => {
     setLoading(false);
   };
 
+  const fetchTranslations = async () => {
+    if (!restaurant || !menus.length) return;
+    
+    const menuIds = menus.map(m => m.id);
+    const entityIds = [restaurant.id, ...menuIds];
+    
+    const { data } = await supabase
+      .from("translations")
+      .select("entity_id, field_name, translation_text")
+      .in("entity_type", ["restaurant", "menu"])
+      .in("entity_id", entityIds)
+      .eq("language_code", selectedLanguage);
+    
+    setTranslations(data || []);
+  };
+
+  const getTranslation = (entityId: string, fieldName: string, fallback: string) => {
+    if (selectedLanguage === "nl") return fallback;
+    const translation = translations.find(
+      t => t.entity_id === entityId && t.field_name === fieldName
+    );
+    return translation?.translation_text || fallback;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -86,8 +126,21 @@ const RestaurantMenuOverview = () => {
     );
   }
 
+  const hasMultipleLanguages = restaurant?.enabled_languages && restaurant.enabled_languages.length > 1;
+
   return (
     <div className={`min-h-screen ${theme.bodyBg}`}>
+      {/* Language Selector */}
+      {hasMultipleLanguages && (
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSelector
+            availableLanguages={restaurant!.enabled_languages}
+            currentLanguage={selectedLanguage}
+            onLanguageChange={setSelectedLanguage}
+          />
+        </div>
+      )}
+
       {/* Header */}
       <header className={`${theme.headerBg} ${theme.headerText} py-8`}>
         <div className="container mx-auto px-4 text-center">
@@ -105,7 +158,7 @@ const RestaurantMenuOverview = () => {
           <h1 className={`text-3xl md:text-4xl font-bold ${theme.titleFont}`}>{restaurant?.name}</h1>
           {restaurant?.intro_text && (
             <p className={`mt-4 opacity-80 max-w-xl mx-auto text-sm ${theme.bodyFont}`}>
-              {restaurant.intro_text}
+              {getTranslation(restaurant.id, "intro_text", restaurant.intro_text)}
             </p>
           )}
         </div>
@@ -133,10 +186,12 @@ const RestaurantMenuOverview = () => {
                 <Card className={`${theme.cardBg} ${theme.borderStyle} hover:shadow-lg transition-all cursor-pointer`}>
                   <CardContent className="flex items-center justify-between p-4">
                     <div>
-                      <h3 className={`font-semibold text-lg ${theme.titleFont} ${theme.accentColor}`}>{menu.name}</h3>
+                      <h3 className={`font-semibold text-lg ${theme.titleFont} ${theme.accentColor}`}>
+                        {getTranslation(menu.id, "name", menu.name)}
+                      </h3>
                       {menu.description && (
                         <p className={`text-sm text-muted-foreground mt-1 ${theme.bodyFont}`}>
-                          {menu.description}
+                          {getTranslation(menu.id, "description", menu.description)}
                         </p>
                       )}
                     </div>
