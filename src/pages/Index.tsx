@@ -49,7 +49,7 @@ const Index = () => {
               <Button variant="ghost">Inloggen</Button>
             </Link>
             <Link to="/auth?mode=signup">
-              <Button>Gratis starten</Button>
+              <Button>30 dagen gratis</Button>
             </Link>
           </div>
         </div>
@@ -62,7 +62,7 @@ const Index = () => {
           <div className="max-w-3xl mx-auto text-center">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
               <Zap className="h-3 w-3 mr-1" />
-              100% Gratis
+              30 dagen gratis uitproberen
             </Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 font-serif leading-tight">
               Uw menukaart,{" "}
@@ -75,7 +75,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth?mode=signup">
                 <Button size="lg" className="w-full sm:w-auto text-lg px-8">
-                  Gratis beginnen
+                  30 dagen gratis proberen
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -104,13 +104,13 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Gratis Banner */}
+      {/* Trial Banner */}
       <section className="bg-primary py-6">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-primary-foreground text-center">
-            <Euro className="h-8 w-8" />
+            <Zap className="h-8 w-8" />
             <p className="text-xl md:text-2xl font-bold font-serif">
-              Volledig gratis! Geen verborgen kosten, geen abonnementen.
+              30 dagen gratis uitproberen! Daarna vanaf €9/maand.
             </p>
           </div>
         </div>
@@ -133,7 +133,7 @@ const Index = () => {
             <StepCard 
               number={1} 
               title="Registreer" 
-              description="Maak gratis een account aan in minder dan een minuut" 
+              description="Maak een account aan in minder dan een minuut"
             />
             <StepCard 
               number={2} 
@@ -182,7 +182,7 @@ const Index = () => {
             <div className="mt-8 text-center">
               <Link to="/auth?mode=signup">
                 <Button>
-                  Probeer het zelf - Gratis
+                  30 dagen gratis proberen
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -349,8 +349,8 @@ const Index = () => {
             />
             <FeatureCard
               icon={<Euro className="h-8 w-8" />}
-              title="100% Gratis"
-              description="Geen abonnementen, geen verborgen kosten. Volledig gratis te gebruiken, voor altijd."
+              title="Betaalbaar"
+              description="30 dagen gratis uitproberen. Daarna vanaf €9/maand of €95/jaar. Geen verborgen kosten."
             />
           </div>
         </div>
@@ -416,7 +416,7 @@ const Index = () => {
             </div>
             <blockquote className="text-xl md:text-2xl font-serif text-foreground mb-6">
               "Eindelijk een eenvoudige oplossing voor onze menukaart. In 10 minuten hadden we 
-              alles online staan. En het beste? Het is helemaal gratis!"
+              alles online staan. De proefperiode van 30 dagen was perfect om alles uit te proberen!"
             </blockquote>
             <p className="text-muted-foreground">
               — Restaurant eigenaar
@@ -431,43 +431,71 @@ const Index = () => {
           <div className="text-center mb-12">
             <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">Prijzen</Badge>
             <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">
-              Simpel: Het is gratis!
+              30 dagen gratis uitproberen
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Geen verborgen kosten, geen limieten. Alles wat u nodig heeft, volledig gratis.
+              Start vandaag nog met uw digitale menukaart. Geen creditcard nodig voor de proefperiode.
             </p>
           </div>
 
-          <Card className="max-w-md mx-auto border-primary border-2">
-            <CardContent className="p-8 text-center">
-              <Badge className="mb-4 bg-primary text-primary-foreground">Meest gekozen</Badge>
-              <h3 className="text-2xl font-bold font-serif mb-2">Gratis</h3>
-              <p className="text-5xl font-bold text-primary mb-6">€0</p>
-              <p className="text-muted-foreground mb-6">Voor altijd, geen creditcard nodig</p>
-              <ul className="space-y-3 text-left mb-8">
-                {[
-                  "Onbeperkt restaurants",
-                  "Onbeperkt menu's",
-                  "Onbeperkt gerechten",
-                  "QR-codes downloaden",
-                  "Eigen logo toevoegen",
-                  "Direct wijzigingen doorvoeren",
-                  "Responsive design",
-                  "Geen watermerken"
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link to="/auth?mode=signup" className="block">
-                <Button size="lg" className="w-full">
-                  Gratis beginnen
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <Card className="border-border">
+              <CardContent className="p-8 text-center">
+                <h3 className="text-2xl font-bold font-serif mb-2">Maandelijks</h3>
+                <p className="text-5xl font-bold text-primary mb-2">€9</p>
+                <p className="text-muted-foreground mb-6">per maand</p>
+                <ul className="space-y-3 text-left mb-8">
+                  {[
+                    "Onbeperkt restaurants",
+                    "Onbeperkt menu's",
+                    "Onbeperkt gerechten",
+                    "QR-codes downloaden",
+                    "Eigen logo toevoegen",
+                    "Direct wijzigingen doorvoeren"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/auth?mode=signup" className="block">
+                  <Button size="lg" variant="outline" className="w-full">
+                    30 dagen gratis proberen
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary border-2">
+              <CardContent className="p-8 text-center">
+                <Badge className="mb-4 bg-primary text-primary-foreground">Bespaar 12%</Badge>
+                <h3 className="text-2xl font-bold font-serif mb-2">Jaarlijks</h3>
+                <p className="text-5xl font-bold text-primary mb-2">€95</p>
+                <p className="text-muted-foreground mb-6">per jaar</p>
+                <ul className="space-y-3 text-left mb-8">
+                  {[
+                    "Onbeperkt restaurants",
+                    "Onbeperkt menu's",
+                    "Onbeperkt gerechten",
+                    "QR-codes downloaden",
+                    "Eigen logo toevoegen",
+                    "Direct wijzigingen doorvoeren"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3">
+                      <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link to="/auth?mode=signup" className="block">
+                  <Button size="lg" className="w-full">
+                    30 dagen gratis proberen
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
@@ -479,11 +507,11 @@ const Index = () => {
             Klaar om te beginnen?
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto text-lg">
-            Maak vandaag nog uw digitale menukaart aan. Het is gratis en binnen 5 minuten live!
+            Maak vandaag nog uw digitale menukaart aan. 30 dagen gratis uitproberen, binnen 5 minuten live!
           </p>
           <Link to="/auth?mode=signup">
             <Button size="lg" variant="secondary" className="text-lg px-8">
-              Gratis account aanmaken
+              30 dagen gratis proberen
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -533,7 +561,7 @@ const Index = () => {
                 </li>
                 <li>
                   <Link to="/auth?mode=signup" className="hover:text-foreground transition-colors">
-                    Gratis registreren
+                    Registreren
                   </Link>
                 </li>
               </ul>
