@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Edit2, Trash2, QrCode, GripVertical, Eye } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, Trash2, QrCode, GripVertical, Eye, Globe } from "lucide-react";
 import { AllergenSelector, getAllergenInfo } from "@/components/AllergenSelector";
+import TranslationManager from "@/components/TranslationManager";
 
 interface Category {
   id: string;
@@ -33,6 +34,7 @@ interface Restaurant {
   id: string;
   name: string;
   slug: string;
+  enabled_languages: string[];
 }
 
 interface MenuType {
@@ -66,6 +68,31 @@ const MenuManager = () => {
   const [itemCategoryId, setItemCategoryId] = useState("");
   const [itemAllergens, setItemAllergens] = useState<string[]>([]);
 
+  // Translation dialog
+  const [translationDialogOpen, setTranslationDialogOpen] = useState(false);
+  const [translationTarget, setTranslationTarget] = useState<{
+    type: "category" | "item";
+    id: string;
+    name: string;
+    fields: { name: string; label: string; multiline?: boolean; originalValue: string }[];
+  } | null>(null);
+
+  const hasMultipleLanguages = restaurant?.enabled_languages && restaurant.enabled_languages.filter(l => l !== "nl").length > 0;
+
+  const openTranslationDialog = (
+    type: "category" | "item",
+    id: string,
+    name: string,
+    description: string | null
+  ) => {
+    const fields = [
+      { name: "name", label: "Naam", originalValue: name },
+      { name: "description", label: "Beschrijving", multiline: true, originalValue: description || "" },
+    ];
+    setTranslationTarget({ type, id, name, fields });
+    setTranslationDialogOpen(true);
+  };
+
   useEffect(() => {
     fetchData();
   }, [restaurantId, menuId]);
@@ -75,7 +102,7 @@ const MenuManager = () => {
     
     const { data: restaurantData, error: restaurantError } = await supabase
       .from("restaurants")
-      .select("id, name, slug")
+      .select("id, name, slug, enabled_languages")
       .eq("id", restaurantId)
       .single();
 
@@ -355,6 +382,16 @@ const MenuManager = () => {
                       <CardTitle className="text-xl font-serif">{category.name}</CardTitle>
                     </div>
                     <div className="flex gap-2">
+                      {hasMultipleLanguages && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openTranslationDialog("category", category.id, category.name, category.description)}
+                          title="Vertalingen"
+                        >
+                          <Globe className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -410,6 +447,16 @@ const MenuManager = () => {
                               <span className="font-semibold text-primary">
                                 €{item.price.toFixed(2)}
                               </span>
+                            )}
+                            {hasMultipleLanguages && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openTranslationDialog("item", item.id, item.name, item.description)}
+                                title="Vertalingen"
+                              >
+                                <Globe className="h-4 w-4" />
+                              </Button>
                             )}
                             <Button
                               variant="ghost"
@@ -532,6 +579,25 @@ const MenuManager = () => {
                 <Button onClick={saveItem}>Opslaan</Button>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Translation Dialog */}
+        <Dialog open={translationDialogOpen} onOpenChange={setTranslationDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="font-serif">Vertalingen</DialogTitle>
+            </DialogHeader>
+            {translationTarget && restaurant && (
+              <TranslationManager
+                entityType={translationTarget.type}
+                entityId={translationTarget.id}
+                entityName={translationTarget.name}
+                fields={translationTarget.fields}
+                enabledLanguages={restaurant.enabled_languages}
+                onClose={() => setTranslationDialogOpen(false)}
+              />
+            )}
           </DialogContent>
         </Dialog>
       </main>
