@@ -147,6 +147,131 @@ export type Database = {
           },
         ]
       }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_name: string
+          item_price: number
+          menu_item_id: string
+          notes: string | null
+          order_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_name: string
+          item_price: number
+          menu_item_id: string
+          notes?: string | null
+          order_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_name?: string
+          item_price?: number
+          menu_item_id?: string
+          notes?: string | null
+          order_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_address: string | null
+          delivery_city: string | null
+          delivery_fee: number | null
+          delivery_postal_code: string | null
+          estimated_time: number | null
+          id: string
+          notes: string | null
+          order_number: number
+          order_status: string
+          order_type: string
+          payment_method: string
+          payment_status: string
+          restaurant_id: string
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone: string
+          delivery_address?: string | null
+          delivery_city?: string | null
+          delivery_fee?: number | null
+          delivery_postal_code?: string | null
+          estimated_time?: number | null
+          id?: string
+          notes?: string | null
+          order_number?: number
+          order_status?: string
+          order_type: string
+          payment_method: string
+          payment_status?: string
+          restaurant_id: string
+          subtotal: number
+          total: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string
+          delivery_address?: string | null
+          delivery_city?: string | null
+          delivery_fee?: number | null
+          delivery_postal_code?: string | null
+          estimated_time?: number | null
+          id?: string
+          notes?: string | null
+          order_number?: number
+          order_status?: string
+          order_type?: string
+          payment_method?: string
+          payment_status?: string
+          restaurant_id?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -173,6 +298,68 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      restaurant_ordering_settings: {
+        Row: {
+          accepts_card: boolean
+          accepts_cash: boolean
+          accepts_delivery: boolean
+          accepts_ideal: boolean
+          accepts_pickup: boolean
+          created_at: string
+          delivery_fee: number | null
+          estimated_delivery_time: number | null
+          estimated_pickup_time: number | null
+          id: string
+          is_ordering_enabled: boolean
+          minimum_order_amount: number | null
+          opening_hours: Json | null
+          restaurant_id: string
+          updated_at: string
+        }
+        Insert: {
+          accepts_card?: boolean
+          accepts_cash?: boolean
+          accepts_delivery?: boolean
+          accepts_ideal?: boolean
+          accepts_pickup?: boolean
+          created_at?: string
+          delivery_fee?: number | null
+          estimated_delivery_time?: number | null
+          estimated_pickup_time?: number | null
+          id?: string
+          is_ordering_enabled?: boolean
+          minimum_order_amount?: number | null
+          opening_hours?: Json | null
+          restaurant_id: string
+          updated_at?: string
+        }
+        Update: {
+          accepts_card?: boolean
+          accepts_cash?: boolean
+          accepts_delivery?: boolean
+          accepts_ideal?: boolean
+          accepts_pickup?: boolean
+          created_at?: string
+          delivery_fee?: number | null
+          estimated_delivery_time?: number | null
+          estimated_pickup_time?: number | null
+          id?: string
+          is_ordering_enabled?: boolean
+          minimum_order_amount?: number | null
+          opening_hours?: Json | null
+          restaurant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_ordering_settings_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: true
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       restaurants: {
         Row: {
