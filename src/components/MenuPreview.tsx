@@ -1,14 +1,14 @@
-import { themes, MenuTheme } from "@/lib/menu-themes";
+import { getTheme } from "@/lib/menu-themes";
 
 interface MenuPreviewProps {
-  theme: MenuTheme;
+  theme: string | null | undefined;
   restaurantName: string;
   logoUrl: string | null;
   introText: string;
 }
 
 const MenuPreview = ({ theme, restaurantName, logoUrl, introText }: MenuPreviewProps) => {
-  const themeConfig = themes[theme];
+  const themeConfig = getTheme(theme);
 
   // Sample preview data
   const sampleCategories = [
