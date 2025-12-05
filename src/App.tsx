@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import RestaurantForm from "./pages/RestaurantForm";
 import MenuList from "./pages/MenuList";
 import MenuManager from "./pages/MenuManager";
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/dashboard/restaurant/new" element={<RestaurantForm />} />
           <Route path="/dashboard/restaurant/:id" element={<RestaurantForm />} />
           <Route path="/dashboard/restaurant/:id/menus" element={<MenuList />} />
