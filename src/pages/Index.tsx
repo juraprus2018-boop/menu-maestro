@@ -42,7 +42,7 @@ const Index = () => {
                   Gratis beginnen
                 </Button>
               </Link>
-              <Link to="/menu/demo">
+              <Link to="/menu/le-troubadour-valkenswaard/752af5cf-43bc-4965-a777-7c680d9169b1">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg px-8">
                   Bekijk demo
                 </Button>
