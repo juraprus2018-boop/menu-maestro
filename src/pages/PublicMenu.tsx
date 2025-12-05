@@ -3,8 +3,10 @@ import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Store, UtensilsCrossed } from "lucide-react";
+import { Store, UtensilsCrossed, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Restaurant {
   id: string;
@@ -134,30 +136,38 @@ const PublicMenu = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-primary text-primary-foreground py-8">
-        <div className="container mx-auto px-4 text-center">
-          {restaurant?.logo_url ? (
-            <img
-              src={restaurant.logo_url}
-              alt={restaurant.name}
-              className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-primary-foreground/20"
-            />
-          ) : (
-            <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-primary-foreground/20 flex items-center justify-center">
-              <UtensilsCrossed className="h-12 w-12" />
-            </div>
-          )}
-          <h1 className="text-3xl md:text-4xl font-bold font-serif">{restaurant?.name}</h1>
-          <p className="mt-2 text-xl text-primary-foreground/90">{menu?.name}</p>
-          {menu?.description && (
-            <p className="mt-2 text-primary-foreground/70 max-w-xl mx-auto">
-              {menu.description}
-            </p>
-          )}
-          {restaurant?.intro_text && (
-            <p className="mt-4 text-primary-foreground/80 max-w-xl mx-auto text-sm">
-              {restaurant.intro_text}
-            </p>
-          )}
+        <div className="container mx-auto px-4">
+          <Link to={`/menu/${slug}`}>
+            <Button variant="ghost" size="sm" className="mb-4 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Alle menu's
+            </Button>
+          </Link>
+          <div className="text-center">
+            {restaurant?.logo_url ? (
+              <img
+                src={restaurant.logo_url}
+                alt={restaurant.name}
+                className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-primary-foreground/20"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-primary-foreground/20 flex items-center justify-center">
+                <UtensilsCrossed className="h-12 w-12" />
+              </div>
+            )}
+            <h1 className="text-3xl md:text-4xl font-bold font-serif">{restaurant?.name}</h1>
+            <p className="mt-2 text-xl text-primary-foreground/90">{menu?.name}</p>
+            {menu?.description && (
+              <p className="mt-2 text-primary-foreground/70 max-w-xl mx-auto">
+                {menu.description}
+              </p>
+            )}
+            {restaurant?.intro_text && (
+              <p className="mt-4 text-primary-foreground/80 max-w-xl mx-auto text-sm">
+                {restaurant.intro_text}
+              </p>
+            )}
+          </div>
         </div>
       </header>
 
