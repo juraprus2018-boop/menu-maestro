@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Store, UtensilsCrossed, ArrowLeft, Filter, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getTheme, ThemeConfig } from "@/lib/menu-themes";
@@ -343,7 +342,7 @@ const PublicMenu = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-10">
             {categories.map((category) => {
               const categoryItems = filteredMenuItems.filter(
                 (item) => item.category_id === category.id
@@ -353,31 +352,31 @@ const PublicMenu = () => {
 
               return (
                 <section key={category.id}>
-                  <div className="mb-4">
-                    <h2 className={`text-2xl font-bold ${theme.titleFont} ${theme.accentColor}`}>
+                  <div className="mb-6">
+                    <h2 className={`${theme.categoryStyle}`}>
                       {getTranslation("category", category.id, "name", category.name)}
                     </h2>
                     {category.description && (
-                      <p className={`text-muted-foreground text-sm mt-1 ${theme.bodyFont}`}>
+                      <p className={`text-muted-foreground text-sm mt-2 ${theme.bodyFont}`}>
                         {getTranslation("category", category.id, "description", category.description)}
                       </p>
                     )}
                   </div>
-                  <div className="space-y-3">
+                  <div>
                     {categoryItems.map((item, index) => (
-                      <div key={item.id}>
-                        <div className="flex justify-between items-start gap-4 py-3">
+                      <div key={item.id} className={`${theme.itemSpacing} ${index > 0 ? theme.borderStyle : ''}`}>
+                        <div className="flex justify-between items-start gap-4">
                           <div className="flex-1">
-                            <h3 className={`font-medium ${theme.accentColor} ${theme.bodyFont}`}>
+                            <h3 className={`font-medium ${theme.accentColor}`}>
                               {getTranslation("item", item.id, "name", item.name)}
                             </h3>
                             {item.description && (
-                              <p className={`text-sm text-muted-foreground mt-1 ${theme.bodyFont}`}>
+                              <p className={`text-sm mt-1 ${theme.bodyFont}`}>
                                 {getTranslation("item", item.id, "description", item.description)}
                               </p>
                             )}
                             {item.allergens && item.allergens.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mt-1">
+                              <div className="flex flex-wrap gap-1 mt-2">
                                 {item.allergens.map((allergen) => {
                                   const info = getAllergenInfo(allergen);
                                   return (
@@ -390,14 +389,11 @@ const PublicMenu = () => {
                             )}
                           </div>
                           {item.price !== null && (
-                            <Badge className={`text-base font-semibold whitespace-nowrap ${theme.priceStyle}`}>
+                            <span className={`text-base font-medium whitespace-nowrap ${theme.priceStyle}`}>
                               €{item.price.toFixed(2)}
-                            </Badge>
+                            </span>
                           )}
                         </div>
-                        {index < categoryItems.length - 1 && (
-                          <Separator className="opacity-50" />
-                        )}
                       </div>
                     ))}
                   </div>

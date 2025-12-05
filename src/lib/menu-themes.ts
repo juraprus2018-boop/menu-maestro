@@ -1,5 +1,5 @@
 // Menu theme configurations
-export type MenuTheme = 'default' | 'classic' | 'modern';
+export type MenuTheme = 'elegant' | 'default' | 'simple';
 
 export interface ThemeConfig {
   name: string;
@@ -13,12 +13,29 @@ export interface ThemeConfig {
   accentColor: string;
   borderStyle: string;
   priceStyle: string;
+  categoryStyle: string;
+  itemSpacing: string;
 }
 
 export const themes: Record<MenuTheme, ThemeConfig> = {
+  elegant: {
+    name: 'Elegant',
+    description: 'Michelin-stijl, verfijnd en luxueus',
+    headerBg: 'bg-stone-900',
+    headerText: 'text-stone-100',
+    bodyBg: 'bg-stone-50',
+    cardBg: 'bg-white',
+    titleFont: 'font-serif italic tracking-wide',
+    bodyFont: 'font-serif text-stone-600',
+    accentColor: 'text-amber-700',
+    borderStyle: 'border-b border-stone-200',
+    priceStyle: 'text-stone-800 font-light',
+    categoryStyle: 'text-center uppercase tracking-[0.3em] text-stone-400 text-sm border-b border-stone-200 pb-2',
+    itemSpacing: 'py-6',
+  },
   default: {
     name: 'Standaard',
-    description: 'Schone, moderne uitstraling',
+    description: 'Moderne en professionele uitstraling',
     headerBg: 'bg-primary',
     headerText: 'text-primary-foreground',
     bodyBg: 'bg-background',
@@ -26,34 +43,25 @@ export const themes: Record<MenuTheme, ThemeConfig> = {
     titleFont: 'font-serif',
     bodyFont: '',
     accentColor: 'text-primary',
-    borderStyle: 'border border-border',
-    priceStyle: 'bg-secondary text-secondary-foreground',
+    borderStyle: 'border border-border rounded-lg',
+    priceStyle: 'bg-secondary text-secondary-foreground px-3 py-1 rounded-full text-sm',
+    categoryStyle: 'text-xl font-semibold text-foreground',
+    itemSpacing: 'py-4',
   },
-  classic: {
-    name: 'Klassiek',
-    description: 'Elegant en tijdloos',
-    headerBg: 'bg-amber-900',
-    headerText: 'text-amber-50',
-    bodyBg: 'bg-amber-50',
+  simple: {
+    name: 'Simpel',
+    description: 'Eenvoudig en overzichtelijk',
+    headerBg: 'bg-white border-b',
+    headerText: 'text-stone-800',
+    bodyBg: 'bg-white',
     cardBg: 'bg-white',
-    titleFont: 'font-serif italic',
-    bodyFont: 'font-serif',
-    accentColor: 'text-amber-800',
-    borderStyle: 'border-2 border-amber-200',
-    priceStyle: 'bg-amber-100 text-amber-900',
-  },
-  modern: {
-    name: 'Modern',
-    description: 'Strak en minimalistisch',
-    headerBg: 'bg-zinc-900',
-    headerText: 'text-zinc-50',
-    bodyBg: 'bg-zinc-50',
-    cardBg: 'bg-white',
-    titleFont: 'font-sans font-bold uppercase tracking-wide',
-    bodyFont: 'font-sans',
-    accentColor: 'text-zinc-900',
-    borderStyle: 'border-0 shadow-md',
-    priceStyle: 'bg-zinc-900 text-zinc-50',
+    titleFont: 'font-sans font-medium',
+    bodyFont: 'font-sans text-stone-500 text-sm',
+    accentColor: 'text-stone-700',
+    borderStyle: '',
+    priceStyle: 'text-stone-600',
+    categoryStyle: 'text-lg font-medium text-stone-700 border-b border-stone-100 pb-1',
+    itemSpacing: 'py-3',
   },
 };
 
