@@ -70,9 +70,49 @@ const OrdersDashboard = () => {
   useEffect(() => {
     if (restaurantId) {
       fetchOrders();
-      subscribeToOrders();
     }
   }, [restaurantId, statusFilter]);
+
+  // Realtime subscription for new orders
+  useEffect(() => {
+    if (!restaurantId) return;
+
+    const channel = supabase
+      .channel("orders-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "orders",
+          filter: `restaurant_id=eq.${restaurantId}`,
+        },
+        (payload) => {
+          toast({
+            title: "🔔 Nieuwe bestelling!",
+            description: `Bestelling #${payload.new.order_number} van ${payload.new.customer_name}`,
+          });
+          fetchOrders();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
+          filter: `restaurant_id=eq.${restaurantId}`,
+        },
+        () => {
+          fetchOrders();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [restaurantId]);
 
   const fetchOrders = async () => {
     try {
@@ -116,28 +156,6 @@ const OrdersDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const subscribeToOrders = () => {
-    const channel = supabase
-      .channel("orders-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "orders",
-          filter: `restaurant_id=eq.${restaurantId}`,
-        },
-        () => {
-          fetchOrders();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   };
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
