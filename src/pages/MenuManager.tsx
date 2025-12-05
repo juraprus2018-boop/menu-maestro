@@ -21,7 +21,7 @@ interface MenuItem {
   id: string;
   name: string;
   description: string | null;
-  price: number;
+  price: number | null;
   is_available: boolean;
   category_id: string;
   sort_order: number;
@@ -173,7 +173,7 @@ const MenuManager = () => {
       setEditingItem(item);
       setItemName(item.name);
       setItemDescription(item.description || "");
-      setItemPrice(item.price.toString());
+      setItemPrice(item.price !== null ? item.price.toString() : "");
     } else {
       setEditingItem(null);
       setItemName("");
@@ -184,12 +184,12 @@ const MenuManager = () => {
   };
 
   const saveItem = async () => {
-    if (!itemName.trim() || !itemPrice) return;
+    if (!itemName.trim()) return;
 
     const itemData = {
       name: itemName,
       description: itemDescription || null,
-      price: parseFloat(itemPrice),
+      price: itemPrice ? parseFloat(itemPrice) : null,
       category_id: itemCategoryId,
       sort_order: editingItem 
         ? editingItem.sort_order 
@@ -352,9 +352,11 @@ const MenuManager = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
-                            <span className="font-semibold text-primary">
-                              €{item.price.toFixed(2)}
-                            </span>
+                            {item.price !== null && (
+                              <span className="font-semibold text-primary">
+                                €{item.price.toFixed(2)}
+                              </span>
+                            )}
                             <Button
                               variant="ghost"
                               size="icon"
@@ -454,7 +456,7 @@ const MenuManager = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="itemPrice">Prijs (€) *</Label>
+                <Label htmlFor="itemPrice">Prijs (€)</Label>
                 <Input
                   id="itemPrice"
                   type="number"
@@ -462,7 +464,7 @@ const MenuManager = () => {
                   min="0"
                   value={itemPrice}
                   onChange={(e) => setItemPrice(e.target.value)}
-                  placeholder="12.50"
+                  placeholder="12.50 (optioneel)"
                 />
               </div>
               <div className="flex justify-end gap-2">
