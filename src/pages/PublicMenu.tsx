@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Store, UtensilsCrossed, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getTheme, ThemeConfig } from "@/lib/menu-themes";
 
 interface Restaurant {
   id: string;
@@ -14,6 +15,7 @@ interface Restaurant {
   logo_url: string | null;
   intro_text: string | null;
   slug: string;
+  theme: string | null;
 }
 
 interface MenuType {
@@ -47,6 +49,7 @@ const PublicMenu = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [theme, setTheme] = useState<ThemeConfig>(getTheme('default'));
 
   useEffect(() => {
     fetchMenu();
@@ -67,6 +70,7 @@ const PublicMenu = () => {
     }
 
     setRestaurant(restaurantData);
+    setTheme(getTheme(restaurantData.theme));
 
     // Fetch menu
     const { data: menuData, error: menuError } = await supabase
@@ -133,12 +137,12 @@ const PublicMenu = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen ${theme.bodyBg}`}>
       {/* Header */}
-      <header className="bg-primary text-primary-foreground py-8">
+      <header className={`${theme.headerBg} ${theme.headerText} py-8`}>
         <div className="container mx-auto px-4">
           <Link to={`/menu/${slug}`}>
-            <Button variant="ghost" size="sm" className="mb-4 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+            <Button variant="ghost" size="sm" className={`mb-4 ${theme.headerText}/80 hover:${theme.headerText} hover:bg-white/10`}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Alle menu's
             </Button>
@@ -148,22 +152,22 @@ const PublicMenu = () => {
               <img
                 src={restaurant.logo_url}
                 alt={restaurant.name}
-                className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-primary-foreground/20"
+                className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white/20"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-primary-foreground/20 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-white/20 flex items-center justify-center">
                 <UtensilsCrossed className="h-12 w-12" />
               </div>
             )}
-            <h1 className="text-3xl md:text-4xl font-bold font-serif">{restaurant?.name}</h1>
-            <p className="mt-2 text-xl text-primary-foreground/90">{menu?.name}</p>
+            <h1 className={`text-3xl md:text-4xl font-bold ${theme.titleFont}`}>{restaurant?.name}</h1>
+            <p className={`mt-2 text-xl opacity-90 ${theme.bodyFont}`}>{menu?.name}</p>
             {menu?.description && (
-              <p className="mt-2 text-primary-foreground/70 max-w-xl mx-auto">
+              <p className={`mt-2 opacity-70 max-w-xl mx-auto ${theme.bodyFont}`}>
                 {menu.description}
               </p>
             )}
             {restaurant?.intro_text && (
-              <p className="mt-4 text-primary-foreground/80 max-w-xl mx-auto text-sm">
+              <p className={`mt-4 opacity-80 max-w-xl mx-auto text-sm ${theme.bodyFont}`}>
                 {restaurant.intro_text}
               </p>
             )}
@@ -174,7 +178,7 @@ const PublicMenu = () => {
       {/* Menu */}
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         {categories.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className={`text-center py-12 ${theme.cardBg} ${theme.borderStyle}`}>
             <CardContent>
               <UtensilsCrossed className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">
@@ -194,11 +198,11 @@ const PublicMenu = () => {
               return (
                 <section key={category.id}>
                   <div className="mb-4">
-                    <h2 className="text-2xl font-bold font-serif text-foreground">
+                    <h2 className={`text-2xl font-bold ${theme.titleFont} ${theme.accentColor}`}>
                       {category.name}
                     </h2>
                     {category.description && (
-                      <p className="text-muted-foreground text-sm mt-1">
+                      <p className={`text-muted-foreground text-sm mt-1 ${theme.bodyFont}`}>
                         {category.description}
                       </p>
                     )}
@@ -208,17 +212,17 @@ const PublicMenu = () => {
                       <div key={item.id}>
                         <div className="flex justify-between items-start gap-4 py-3">
                           <div className="flex-1">
-                            <h3 className="font-medium text-foreground">
+                            <h3 className={`font-medium ${theme.accentColor} ${theme.bodyFont}`}>
                               {item.name}
                             </h3>
                             {item.description && (
-                              <p className="text-sm text-muted-foreground mt-1">
+                              <p className={`text-sm text-muted-foreground mt-1 ${theme.bodyFont}`}>
                                 {item.description}
                               </p>
                             )}
                           </div>
                           {item.price !== null && (
-                            <Badge variant="secondary" className="text-base font-semibold whitespace-nowrap">
+                            <Badge className={`text-base font-semibold whitespace-nowrap ${theme.priceStyle}`}>
                               €{item.price.toFixed(2)}
                             </Badge>
                           )}
@@ -236,14 +240,14 @@ const PublicMenu = () => {
         )}
 
         {/* Footer */}
-        <footer className="mt-12 pt-8 border-t border-border text-center">
+        <footer className="mt-12 pt-8 border-t border-border/50 text-center">
           <p className="text-sm text-muted-foreground">
             Digitale menukaart door{" "}
             <a
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+              className={`${theme.accentColor} hover:underline`}
             >
               digitalemenukaart.nl
             </a>

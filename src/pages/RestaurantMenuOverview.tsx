@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Store, UtensilsCrossed, ChevronRight } from "lucide-react";
+import { getTheme, ThemeConfig } from "@/lib/menu-themes";
 
 interface Restaurant {
   id: string;
@@ -11,6 +11,7 @@ interface Restaurant {
   logo_url: string | null;
   intro_text: string | null;
   slug: string;
+  theme: string | null;
 }
 
 interface MenuType {
@@ -26,6 +27,7 @@ const RestaurantMenuOverview = () => {
   const [menus, setMenus] = useState<MenuType[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [theme, setTheme] = useState<ThemeConfig>(getTheme('default'));
 
   useEffect(() => {
     fetchData();
@@ -46,6 +48,7 @@ const RestaurantMenuOverview = () => {
     }
 
     setRestaurant(restaurantData);
+    setTheme(getTheme(restaurantData.theme));
 
     // Fetch active menus
     const { data: menusData } = await supabase
@@ -84,24 +87,24 @@ const RestaurantMenuOverview = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen ${theme.bodyBg}`}>
       {/* Header */}
-      <header className="bg-primary text-primary-foreground py-8">
+      <header className={`${theme.headerBg} ${theme.headerText} py-8`}>
         <div className="container mx-auto px-4 text-center">
           {restaurant?.logo_url ? (
             <img
               src={restaurant.logo_url}
               alt={restaurant.name}
-              className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-primary-foreground/20"
+              className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white/20"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-primary-foreground/20 flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-white/20 flex items-center justify-center">
               <UtensilsCrossed className="h-12 w-12" />
             </div>
           )}
-          <h1 className="text-3xl md:text-4xl font-bold font-serif">{restaurant?.name}</h1>
+          <h1 className={`text-3xl md:text-4xl font-bold ${theme.titleFont}`}>{restaurant?.name}</h1>
           {restaurant?.intro_text && (
-            <p className="mt-4 text-primary-foreground/80 max-w-xl mx-auto text-sm">
+            <p className={`mt-4 opacity-80 max-w-xl mx-auto text-sm ${theme.bodyFont}`}>
               {restaurant.intro_text}
             </p>
           )}
@@ -110,10 +113,12 @@ const RestaurantMenuOverview = () => {
 
       {/* Menu Selection */}
       <main className="container mx-auto px-4 py-8 max-w-2xl">
-        <h2 className="text-xl font-semibold mb-4 text-center font-serif">Kies een menukaart</h2>
+        <h2 className={`text-xl font-semibold mb-4 text-center ${theme.titleFont} ${theme.accentColor}`}>
+          Kies een menukaart
+        </h2>
         
         {menus.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className={`text-center py-12 ${theme.cardBg} ${theme.borderStyle}`}>
             <CardContent>
               <UtensilsCrossed className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">
@@ -125,17 +130,17 @@ const RestaurantMenuOverview = () => {
           <div className="space-y-3">
             {menus.map((menu) => (
               <Link key={menu.id} to={`/menu/${slug}/${menu.id}`}>
-                <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+                <Card className={`${theme.cardBg} ${theme.borderStyle} hover:shadow-lg transition-all cursor-pointer`}>
                   <CardContent className="flex items-center justify-between p-4">
                     <div>
-                      <h3 className="font-semibold font-serif text-lg">{menu.name}</h3>
+                      <h3 className={`font-semibold text-lg ${theme.titleFont} ${theme.accentColor}`}>{menu.name}</h3>
                       {menu.description && (
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className={`text-sm text-muted-foreground mt-1 ${theme.bodyFont}`}>
                           {menu.description}
                         </p>
                       )}
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    <ChevronRight className={`h-5 w-5 ${theme.accentColor}`} />
                   </CardContent>
                 </Card>
               </Link>
@@ -144,14 +149,14 @@ const RestaurantMenuOverview = () => {
         )}
 
         {/* Footer */}
-        <footer className="mt-12 pt-8 border-t border-border text-center">
+        <footer className="mt-12 pt-8 border-t border-border/50 text-center">
           <p className="text-sm text-muted-foreground">
             Digitale menukaart door{" "}
             <a
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+              className={`${theme.accentColor} hover:underline`}
             >
               digitalemenukaart.nl
             </a>
