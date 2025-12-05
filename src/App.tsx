@@ -10,6 +10,7 @@ import RestaurantForm from "./pages/RestaurantForm";
 import MenuList from "./pages/MenuList";
 import MenuManager from "./pages/MenuManager";
 import QRCode from "./pages/QRCode";
+import RestaurantMenuOverview from "./pages/RestaurantMenuOverview";
 import PublicMenu from "./pages/PublicMenu";
 import NotFound from "./pages/NotFound";
 
@@ -29,7 +30,8 @@ const App = () => (
           <Route path="/dashboard/restaurant/:id" element={<RestaurantForm />} />
           <Route path="/dashboard/restaurant/:id/menus" element={<MenuList />} />
           <Route path="/dashboard/restaurant/:id/menu/:menuId" element={<MenuManager />} />
-          <Route path="/dashboard/restaurant/:id/menu/:menuId/qr" element={<QRCode />} />
+          <Route path="/dashboard/restaurant/:id/qr" element={<QRCode />} />
+          <Route path="/menu/:slug" element={<RestaurantMenuOverview />} />
           <Route path="/menu/:slug/:menuId" element={<PublicMenu />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
