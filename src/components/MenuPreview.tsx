@@ -54,29 +54,29 @@ const MenuPreview = ({ theme, restaurantName, logoUrl, introText }: MenuPreviewP
         </div>
 
         {/* Menu content */}
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-6">
           {sampleCategories.map((category) => (
             <div key={category.name}>
-              <h3 className={`text-sm font-semibold ${themeConfig.accentColor} ${themeConfig.titleFont} mb-2`}>
+              <h3 className={`text-sm mb-3 ${themeConfig.categoryStyle}`}>
                 {category.name}
               </h3>
-              <div className="space-y-2">
-                {category.items.map((item) => (
+              <div>
+                {category.items.map((item, index) => (
                   <div
                     key={item.name}
-                    className={`${themeConfig.cardBg} ${themeConfig.borderStyle} rounded p-2`}
+                    className={`${themeConfig.itemSpacing} ${index > 0 ? themeConfig.borderStyle : ''}`}
                   >
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs font-medium ${themeConfig.accentColor} ${themeConfig.bodyFont}`}>
+                        <p className={`text-xs font-medium ${themeConfig.accentColor}`}>
                           {item.name}
                         </p>
-                        <p className={`text-xs text-muted-foreground ${themeConfig.bodyFont} truncate`}>
+                        <p className={`text-xs ${themeConfig.bodyFont} truncate`}>
                           {item.description}
                         </p>
                       </div>
                       {item.price && (
-                        <span className={`text-xs px-1.5 py-0.5 rounded ${themeConfig.priceStyle}`}>
+                        <span className={`text-xs ${themeConfig.priceStyle}`}>
                           €{item.price.toFixed(2)}
                         </span>
                       )}
