@@ -13,6 +13,7 @@ import { useCart } from "@/hooks/useCart";
 import { CartDrawer } from "@/components/ordering/CartDrawer";
 import { CheckoutForm } from "@/components/ordering/CheckoutForm";
 import { toast } from "sonner";
+import { isRestaurantOpen, OpeningHours } from "@/components/OpeningHoursEditor";
 
 interface Restaurant {
   id: string;
@@ -67,6 +68,7 @@ interface OrderingSettings {
   minimum_order_amount: number | null;
   estimated_pickup_time: number | null;
   estimated_delivery_time: number | null;
+  opening_hours: Record<string, { open: string; close: string; closed: boolean }> | null;
 }
 
 const PublicMenu = () => {
@@ -175,7 +177,10 @@ const PublicMenu = () => {
       .maybeSingle();
 
     if (orderingData) {
-      setOrderingSettings(orderingData);
+      setOrderingSettings({
+        ...orderingData,
+        opening_hours: orderingData.opening_hours as Record<string, { open: string; close: string; closed: boolean }> | null,
+      });
     }
 
     // Fetch menu
@@ -240,6 +245,12 @@ const PublicMenu = () => {
 
   const isOrderingEnabled = orderingSettings?.is_ordering_enabled && 
     (orderingSettings.accepts_pickup || orderingSettings.accepts_delivery);
+
+  const openStatus = orderingSettings?.opening_hours 
+    ? isRestaurantOpen(orderingSettings.opening_hours as unknown as OpeningHours)
+    : { isOpen: true, message: "" };
+
+  const canOrder = isOrderingEnabled && openStatus.isOpen;
 
   if (loading) {
     return (
@@ -322,9 +333,12 @@ const PublicMenu = () => {
 
       {/* Ordering Banner */}
       {isOrderingEnabled && (
-        <div className="bg-primary text-primary-foreground py-3 text-center">
+        <div className={`py-3 text-center ${openStatus.isOpen ? 'bg-primary text-primary-foreground' : 'bg-orange-500 text-white'}`}>
           <p className="text-sm font-medium">
-            🛒 Online bestellen is beschikbaar! Voeg items toe aan je winkelwagen.
+            {openStatus.isOpen 
+              ? "🛒 Online bestellen is beschikbaar! Voeg items toe aan je winkelwagen."
+              : `⏰ ${openStatus.message}. Je kunt de kaart bekijken maar niet bestellen.`
+            }
           </p>
         </div>
       )}
@@ -454,7 +468,7 @@ const PublicMenu = () => {
                                 €{item.price.toFixed(2)}
                               </span>
                             )}
-                            {isOrderingEnabled && item.price !== null && (
+                            {canOrder && item.price !== null && (
                               <Button
                                 size="icon"
                                 variant="outline"
@@ -492,7 +506,7 @@ const PublicMenu = () => {
       </main>
 
       {/* Cart Drawer */}
-      {isOrderingEnabled && orderingSettings && (
+      {canOrder && orderingSettings && (
         <>
           <CartDrawer
             items={cart.items}
