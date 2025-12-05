@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Upload, QrCode, Menu } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette } from "lucide-react";
+import { themes, MenuTheme } from "@/lib/menu-themes";
 
 const RestaurantForm = () => {
   const { id } = useParams();
@@ -16,6 +18,7 @@ const RestaurantForm = () => {
   const [slug, setSlug] = useState("");
   const [introText, setIntroText] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [theme, setTheme] = useState<MenuTheme>("default");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
@@ -46,6 +49,7 @@ const RestaurantForm = () => {
       setSlug(data.slug);
       setIntroText(data.intro_text || "");
       setLogoUrl(data.logo_url);
+      setTheme((data.theme as MenuTheme) || "default");
     }
   };
 
@@ -107,6 +111,7 @@ const RestaurantForm = () => {
       slug,
       intro_text: introText || null,
       logo_url: logoUrl,
+      theme,
       user_id: user.id,
     };
 
@@ -256,6 +261,36 @@ const RestaurantForm = () => {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Palette className="h-5 w-5 text-primary" />
+                  <Label>Menu template</Label>
+                </div>
+                <RadioGroup value={theme} onValueChange={(value) => setTheme(value as MenuTheme)}>
+                  <div className="grid gap-4">
+                    {(Object.keys(themes) as MenuTheme[]).map((themeKey) => {
+                      const themeConfig = themes[themeKey];
+                      return (
+                        <div key={themeKey} className="flex items-center space-x-3">
+                          <RadioGroupItem value={themeKey} id={themeKey} />
+                          <Label htmlFor={themeKey} className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-12 h-12 rounded-lg ${themeConfig.headerBg} flex items-center justify-center`}>
+                                <span className={`text-xs font-bold ${themeConfig.headerText}`}>Aa</span>
+                              </div>
+                              <div>
+                                <p className="font-semibold">{themeConfig.name}</p>
+                                <p className="text-sm text-muted-foreground">{themeConfig.description}</p>
+                              </div>
+                            </div>
+                          </Label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </RadioGroup>
               </div>
 
               <div className="flex gap-4 pt-4">

@@ -152,6 +152,7 @@ export type Database = {
           logo_url: string | null
           name: string
           slug: string
+          theme: string
           updated_at: string
           user_id: string
         }
@@ -162,6 +163,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           slug: string
+          theme?: string
           updated_at?: string
           user_id: string
         }
@@ -172,6 +174,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           slug?: string
+          theme?: string
           updated_at?: string
           user_id?: string
         }
