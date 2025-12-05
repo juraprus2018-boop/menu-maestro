@@ -117,6 +117,11 @@ export function CheckoutForm({
 
       if (itemsError) throw itemsError;
 
+      // Send email notifications (don't await - fire and forget)
+      supabase.functions.invoke("send-order-notification", {
+        body: { orderId: order.id, restaurantId },
+      }).catch((err) => console.error("Error sending order notification:", err));
+
       toast.success(`Bestelling #${order.order_number} is geplaatst!`);
       onOrderComplete();
       onClose();
