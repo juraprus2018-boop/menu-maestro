@@ -19,6 +19,9 @@ import {
   MonitorSmartphone
 } from "lucide-react";
 import qrTableMockup from "@/assets/qr-table-mockup.png";
+import screenshotDashboard from "@/assets/screenshot-dashboard.png";
+import screenshotMenu from "@/assets/screenshot-menu.png";
+import screenshotQrcode from "@/assets/screenshot-qrcode.png";
 
 const Index = () => {
   return (
@@ -188,8 +191,125 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Screenshots Section */}
+      <section className="py-20 bg-card">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <Badge className="mb-4">Bekijk het dashboard</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">
+              Zo ziet het eruit
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Een kijkje in het dashboard waar u alles beheert
+            </p>
+          </div>
+
+          {/* Screenshot 1: Dashboard */}
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <h3 className="text-2xl font-bold font-serif mb-4">Overzichtelijk dashboard</h3>
+                <p className="text-muted-foreground mb-4">
+                  Beheer al uw restaurants vanuit één overzichtelijk dashboard. 
+                  Voeg nieuwe restaurants toe, bewerk bestaande en bekijk statistieken.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Meerdere restaurants beheren
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Eigen logo uploaden
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Welkomsttekst instellen
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <img 
+                  src={screenshotDashboard} 
+                  alt="Dashboard overzicht" 
+                  className="rounded-xl shadow-lg border border-border w-full"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Screenshot 2: Menu beheer */}
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div className="order-2 lg:order-1">
+                <img 
+                  src={screenshotMenu} 
+                  alt="Menu beheer" 
+                  className="rounded-xl shadow-lg border border-border w-full"
+                />
+              </div>
+              <div className="order-1 lg:order-2">
+                <h3 className="text-2xl font-bold font-serif mb-4">Menu's en gerechten beheren</h3>
+                <p className="text-muted-foreground mb-4">
+                  Maak eenvoudig meerdere menu's aan zoals Lunch, Diner of Drankkaart. 
+                  Voeg categorieën en gerechten toe met beschrijving en prijs.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Onbeperkt menu's aanmaken
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Categorieën organiseren
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Prijzen zijn optioneel
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Screenshot 3: QR Code */}
+          <div className="max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <h3 className="text-2xl font-bold font-serif mb-4">QR-code downloaden</h3>
+                <p className="text-muted-foreground mb-4">
+                  Download uw unieke QR-code en plaats deze op uw tafels. 
+                  Gasten scannen de code en bekijken direct uw digitale menu.
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Hoge kwaliteit PNG download
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Logo in QR-code mogelijk
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    Direct delen via link
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <img 
+                  src={screenshotQrcode} 
+                  alt="QR code generator" 
+                  className="rounded-xl shadow-lg border border-border w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section id="voordelen" className="py-20 bg-card">
+      <section id="voordelen" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <Badge className="mb-4">Voordelen</Badge>
