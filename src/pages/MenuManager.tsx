@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Edit2, Trash2, QrCode, GripVertical, Eye } from "lucide-react";
+import { AllergenSelector, getAllergenInfo } from "@/components/AllergenSelector";
 
 interface Category {
   id: string;
@@ -25,6 +26,7 @@ interface MenuItem {
   is_available: boolean;
   category_id: string;
   sort_order: number;
+  allergens: string[] | null;
 }
 
 interface Restaurant {
@@ -62,6 +64,7 @@ const MenuManager = () => {
   const [itemDescription, setItemDescription] = useState("");
   const [itemPrice, setItemPrice] = useState("");
   const [itemCategoryId, setItemCategoryId] = useState("");
+  const [itemAllergens, setItemAllergens] = useState<string[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -205,11 +208,13 @@ const MenuManager = () => {
       setItemName(item.name);
       setItemDescription(item.description || "");
       setItemPrice(item.price !== null ? item.price.toString() : "");
+      setItemAllergens(item.allergens || []);
     } else {
       setEditingItem(null);
       setItemName("");
       setItemDescription("");
       setItemPrice("");
+      setItemAllergens([]);
     }
     setItemDialogOpen(true);
   };
@@ -225,6 +230,7 @@ const MenuManager = () => {
       sort_order: editingItem 
         ? editingItem.sort_order 
         : menuItems.filter(i => i.category_id === itemCategoryId).length,
+      allergens: itemAllergens.length > 0 ? itemAllergens : null,
     };
 
     if (editingItem) {
@@ -385,6 +391,18 @@ const MenuManager = () => {
                               {item.description && (
                                 <p className="text-sm text-muted-foreground">{item.description}</p>
                               )}
+                              {item.allergens && item.allergens.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {item.allergens.map((allergen) => {
+                                    const info = getAllergenInfo(allergen);
+                                    return (
+                                      <span key={allergen} className="text-xs bg-muted px-1.5 py-0.5 rounded">
+                                        {info.emoji} {info.label}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
@@ -503,6 +521,10 @@ const MenuManager = () => {
                   placeholder="12.50 (optioneel)"
                 />
               </div>
+              <AllergenSelector
+                selectedAllergens={itemAllergens}
+                onChange={setItemAllergens}
+              />
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setItemDialogOpen(false)}>
                   Annuleren

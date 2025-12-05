@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Store, UtensilsCrossed, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getTheme, ThemeConfig } from "@/lib/menu-themes";
+import { getAllergenInfo } from "@/components/AllergenSelector";
 
 interface Restaurant {
   id: string;
@@ -39,6 +40,7 @@ interface MenuItem {
   is_available: boolean;
   category_id: string;
   sort_order: number;
+  allergens: string[] | null;
 }
 
 const PublicMenu = () => {
@@ -219,6 +221,18 @@ const PublicMenu = () => {
                               <p className={`text-sm text-muted-foreground mt-1 ${theme.bodyFont}`}>
                                 {item.description}
                               </p>
+                            )}
+                            {item.allergens && item.allergens.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {item.allergens.map((allergen) => {
+                                  const info = getAllergenInfo(allergen);
+                                  return (
+                                    <span key={allergen} className="text-xs opacity-70">
+                                      {info.emoji}
+                                    </span>
+                                  );
+                                })}
+                              </div>
                             )}
                           </div>
                           {item.price !== null && (
