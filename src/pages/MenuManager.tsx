@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Edit2, Trash2, QrCode, GripVertical, Eye } from "lucide-react";
 
@@ -33,10 +33,17 @@ interface Restaurant {
   slug: string;
 }
 
+interface MenuType {
+  id: string;
+  name: string;
+  restaurant_id: string;
+}
+
 const MenuManager = () => {
-  const { id } = useParams();
+  const { id: restaurantId, menuId } = useParams();
   const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [menu, setMenu] = useState<MenuType | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +65,7 @@ const MenuManager = () => {
 
   useEffect(() => {
     fetchData();
-  }, [id]);
+  }, [restaurantId, menuId]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -66,7 +73,7 @@ const MenuManager = () => {
     const { data: restaurantData, error: restaurantError } = await supabase
       .from("restaurants")
       .select("id, name, slug")
-      .eq("id", id)
+      .eq("id", restaurantId)
       .single();
 
     if (restaurantError || !restaurantData) {
@@ -81,21 +88,44 @@ const MenuManager = () => {
 
     setRestaurant(restaurantData);
 
+    const { data: menuData, error: menuError } = await supabase
+      .from("menus")
+      .select("id, name, restaurant_id")
+      .eq("id", menuId)
+      .single();
+
+    if (menuError || !menuData) {
+      toast({
+        title: "Fout",
+        description: "Menu niet gevonden",
+        variant: "destructive",
+      });
+      navigate(`/dashboard/restaurant/${restaurantId}/menus`);
+      return;
+    }
+
+    setMenu(menuData);
+
     const { data: categoriesData } = await supabase
       .from("menu_categories")
       .select("*")
-      .eq("restaurant_id", id)
+      .eq("menu_id", menuId)
       .order("sort_order");
 
     setCategories(categoriesData || []);
 
-    const { data: itemsData } = await supabase
-      .from("menu_items")
-      .select("*")
-      .in("category_id", (categoriesData || []).map(c => c.id))
-      .order("sort_order");
+    if (categoriesData && categoriesData.length > 0) {
+      const { data: itemsData } = await supabase
+        .from("menu_items")
+        .select("*")
+        .in("category_id", categoriesData.map(c => c.id))
+        .order("sort_order");
 
-    setMenuItems(itemsData || []);
+      setMenuItems(itemsData || []);
+    } else {
+      setMenuItems([]);
+    }
+    
     setLoading(false);
   };
 
@@ -119,7 +149,8 @@ const MenuManager = () => {
     const categoryData = {
       name: categoryName,
       description: categoryDescription || null,
-      restaurant_id: id,
+      menu_id: menuId,
+      restaurant_id: restaurantId,
       sort_order: editingCategory ? editingCategory.sort_order : categories.length,
     };
 
@@ -252,26 +283,31 @@ const MenuManager = () => {
       <header className="border-b border-border bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link to={`/dashboard/restaurant/${id}`}>
+            <Link to={`/dashboard/restaurant/${restaurantId}/menus`}>
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
             <div className="flex items-center gap-2">
               <QrCode className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold text-foreground font-serif">
-                Menu: {restaurant?.name}
-              </span>
+              <div>
+                <span className="text-lg font-bold text-foreground font-serif">
+                  {menu?.name}
+                </span>
+                <span className="text-sm text-muted-foreground ml-2">
+                  ({restaurant?.name})
+                </span>
+              </div>
             </div>
           </div>
           <div className="flex gap-2">
-            <Link to={`/menu/${restaurant?.slug}`} target="_blank">
+            <Link to={`/menu/${restaurant?.slug}/${menuId}`} target="_blank">
               <Button variant="outline" size="sm">
                 <Eye className="mr-2 h-4 w-4" />
                 Bekijken
               </Button>
             </Link>
-            <Link to={`/dashboard/restaurant/${id}/qr`}>
+            <Link to={`/dashboard/restaurant/${restaurantId}/menu/${menuId}/qr`}>
               <Button variant="outline" size="sm">
                 <QrCode className="mr-2 h-4 w-4" />
                 QR-code
@@ -283,7 +319,7 @@ const MenuManager = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold font-serif">Menu beheren</h1>
+          <h1 className="text-2xl font-bold font-serif">Categorieën & Gerechten</h1>
           <Button onClick={() => openCategoryDialog()}>
             <Plus className="mr-2 h-4 w-4" />
             Categorie toevoegen

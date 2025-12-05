@@ -14,39 +14,64 @@ interface Restaurant {
   logo_url: string | null;
 }
 
+interface MenuType {
+  id: string;
+  name: string;
+}
+
 const QRCode = () => {
-  const { id } = useParams();
+  const { id: restaurantId, menuId } = useParams();
   const navigate = useNavigate();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [menu, setMenu] = useState<MenuType | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchRestaurant();
-  }, [id]);
+    fetchData();
+  }, [restaurantId, menuId]);
 
-  const fetchRestaurant = async () => {
-    const { data, error } = await supabase
+  const fetchData = async () => {
+    const { data: restaurantData, error: restaurantError } = await supabase
       .from("restaurants")
       .select("id, name, slug, logo_url")
-      .eq("id", id)
+      .eq("id", restaurantId)
       .single();
 
-    if (error || !data) {
+    if (restaurantError || !restaurantData) {
       toast({
         title: "Fout",
         description: "Restaurant niet gevonden",
         variant: "destructive",
       });
       navigate("/dashboard");
-    } else {
-      setRestaurant(data);
+      return;
     }
+
+    setRestaurant(restaurantData);
+
+    const { data: menuData, error: menuError } = await supabase
+      .from("menus")
+      .select("id, name")
+      .eq("id", menuId)
+      .single();
+
+    if (menuError || !menuData) {
+      toast({
+        title: "Fout",
+        description: "Menu niet gevonden",
+        variant: "destructive",
+      });
+      navigate(`/dashboard/restaurant/${restaurantId}/menus`);
+      return;
+    }
+
+    setMenu(menuData);
     setLoading(false);
   };
 
-  const menuUrl = restaurant ? `${window.location.origin}/menu/${restaurant.slug}` : "";
+  const menuUrl = restaurant && menu ? `${window.location.origin}/menu/${restaurant.slug}/${menu.id}` : "";
 
   const downloadQR = () => {
     if (!qrRef.current) return;
@@ -69,7 +94,7 @@ const QRCode = () => {
         
         const pngFile = canvas.toDataURL("image/png");
         const downloadLink = document.createElement("a");
-        downloadLink.download = `qr-${restaurant?.slug}.png`;
+        downloadLink.download = `qr-${restaurant?.slug}-${menu?.name.toLowerCase().replace(/\s+/g, '-')}.png`;
         downloadLink.href = pngFile;
         downloadLink.click();
       }
@@ -98,7 +123,7 @@ const QRCode = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to={`/dashboard/restaurant/${id}`}>
+          <Link to={`/dashboard/restaurant/${restaurantId}/menu/${menuId}`}>
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -106,7 +131,7 @@ const QRCode = () => {
           <div className="flex items-center gap-2">
             <QrCodeIcon className="h-6 w-6 text-primary" />
             <span className="text-lg font-bold text-foreground font-serif">
-              QR-code: {restaurant?.name}
+              QR-code: {menu?.name}
             </span>
           </div>
         </div>
@@ -115,9 +140,9 @@ const QRCode = () => {
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="font-serif text-2xl">Uw QR-code</CardTitle>
+            <CardTitle className="font-serif text-2xl">QR-code voor {menu?.name}</CardTitle>
             <CardDescription>
-              Download deze QR-code en plaats deze op uw tafels. Gasten kunnen de code scannen om uw menu te bekijken.
+              Download deze QR-code en plaats deze op uw tafels. Gasten kunnen de code scannen om dit menu te bekijken.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
@@ -162,7 +187,7 @@ const QRCode = () => {
                 <code className="flex-1 text-sm bg-background px-3 py-2 rounded border border-border truncate">
                   {menuUrl}
                 </code>
-                <Link to={`/menu/${restaurant?.slug}`} target="_blank">
+                <Link to={`/menu/${restaurant?.slug}/${menuId}`} target="_blank">
                   <Button variant="ghost" size="icon">
                     <ExternalLink className="h-4 w-4" />
                   </Button>
