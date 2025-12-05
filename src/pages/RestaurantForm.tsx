@@ -7,11 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette, Globe } from "lucide-react";
 import { themes, MenuTheme } from "@/lib/menu-themes";
 import MenuPreview from "@/components/MenuPreview";
 import LanguageSettings from "@/components/LanguageSettings";
+import TranslationManager from "@/components/TranslationManager";
 
 const RestaurantForm = () => {
   const { id } = useParams();
@@ -24,8 +26,11 @@ const RestaurantForm = () => {
   const [enabledLanguages, setEnabledLanguages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [translationDialogOpen, setTranslationDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const hasMultipleLanguages = enabledLanguages.filter(l => l !== "nl").length > 0;
 
   useEffect(() => {
     if (isEditing) {
@@ -230,7 +235,20 @@ const RestaurantForm = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="intro">Introductietekst</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="intro">Introductietekst</Label>
+                      {isEditing && hasMultipleLanguages && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setTranslationDialogOpen(true)}
+                        >
+                          <Globe className="h-4 w-4 mr-1" />
+                          Vertalingen
+                        </Button>
+                      )}
+                    </div>
                     <Textarea
                       id="intro"
                       value={introText}
@@ -337,6 +355,27 @@ const RestaurantForm = () => {
             />
           </div>
         </div>
+
+        {/* Translation Dialog */}
+        <Dialog open={translationDialogOpen} onOpenChange={setTranslationDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="font-serif">Vertalingen</DialogTitle>
+            </DialogHeader>
+            {isEditing && id && (
+              <TranslationManager
+                entityType="restaurant"
+                entityId={id}
+                entityName={name}
+                fields={[
+                  { name: "intro_text", label: "Introductietekst", multiline: true, originalValue: introText },
+                ]}
+                enabledLanguages={enabledLanguages}
+                onClose={() => setTranslationDialogOpen(false)}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
