@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, QrCode, LogOut, Settings, Store, Menu } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, QrCode, LogOut, Settings, Store, Menu, CreditCard, AlertTriangle, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { format, isPast, differenceInDays } from "date-fns";
+import { nl } from "date-fns/locale";
 
 interface Restaurant {
   id: string;
@@ -14,19 +17,47 @@ interface Restaurant {
   created_at: string;
 }
 
+interface Profile {
+  trial_ends_at: string;
+}
+
+interface SubscriptionStatus {
+  subscribed: boolean;
+  plan: string | null;
+  subscription_end: string | null;
+}
+
 const Dashboard = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // Check for successful checkout
+    if (searchParams.get("checkout") === "success") {
+      toast({
+        title: "Betaling geslaagd!",
+        description: "Je abonnement is nu actief.",
+      });
+      // Refresh subscription status
+      checkSubscription();
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session) {
         navigate("/auth");
       } else {
         setUserEmail(session.user.email ?? null);
+        setUserId(session.user.id);
       }
     });
 
@@ -35,12 +66,52 @@ const Dashboard = () => {
         navigate("/auth");
       } else {
         setUserEmail(session.user.email ?? null);
+        setUserId(session.user.id);
         fetchRestaurants();
+        fetchProfile(session.user.id);
+        checkSubscription();
+        checkAdminRole(session.user.id);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => authSub.unsubscribe();
   }, [navigate]);
+
+  const fetchProfile = async (uid: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("trial_ends_at")
+      .eq("user_id", uid)
+      .maybeSingle();
+
+    if (!error && data) {
+      setProfile(data);
+    }
+  };
+
+  const checkSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("check-subscription");
+      if (!error && data) {
+        setSubscription(data);
+      }
+    } catch (error) {
+      console.error("Error checking subscription:", error);
+    }
+  };
+
+  const checkAdminRole = async (uid: string) => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", uid)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!error && data) {
+      setIsAdmin(true);
+    }
+  };
 
   const fetchRestaurants = async () => {
     const { data, error } = await supabase
@@ -65,6 +136,38 @@ const Dashboard = () => {
     navigate("/");
   };
 
+  const getTrialInfo = () => {
+    if (!profile) return null;
+    
+    const trialEndDate = new Date(profile.trial_ends_at);
+    const trialEnded = isPast(trialEndDate);
+    const daysLeft = differenceInDays(trialEndDate, new Date());
+
+    if (subscription?.subscribed) {
+      return {
+        status: "subscribed",
+        message: `${subscription.plan === "yearly" ? "Jaarlijks" : "Maandelijks"} abonnement`,
+        variant: "default" as const,
+      };
+    }
+
+    if (trialEnded) {
+      return {
+        status: "expired",
+        message: "Proefperiode verlopen",
+        variant: "destructive" as const,
+      };
+    }
+
+    return {
+      status: "trial",
+      message: `Nog ${daysLeft} ${daysLeft === 1 ? "dag" : "dagen"} proefperiode`,
+      variant: "secondary" as const,
+    };
+  };
+
+  const trialInfo = getTrialInfo();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -75,6 +178,14 @@ const Dashboard = () => {
             <span className="text-xl font-bold text-foreground font-serif">Digitale Menukaart</span>
           </Link>
           <div className="flex items-center gap-4">
+            {isAdmin && (
+              <Link to="/admin">
+                <Button variant="outline" size="sm">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Admin
+                </Button>
+              </Link>
+            )}
             <span className="text-sm text-muted-foreground hidden sm:inline">
               {userEmail}
             </span>
@@ -85,21 +196,54 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* Trial/Subscription Banner */}
+      {trialInfo && trialInfo.status === "expired" && (
+        <div className="bg-destructive/10 border-b border-destructive/20">
+          <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <span className="text-sm font-medium">
+                Je proefperiode is verlopen. Activeer een abonnement om door te gaan.
+              </span>
+            </div>
+            <Link to="/pricing">
+              <Button size="sm">
+                <CreditCard className="h-4 w-4 mr-2" />
+                Bekijk abonnementen
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold font-serif">Mijn Restaurants</h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-3xl font-bold font-serif">Mijn Restaurants</h1>
+              {trialInfo && (
+                <Badge variant={trialInfo.variant}>{trialInfo.message}</Badge>
+              )}
+            </div>
             <p className="text-muted-foreground mt-1">
               Beheer uw restaurants en menu's
             </p>
           </div>
-          <Link to="/dashboard/restaurant/new">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Restaurant toevoegen
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link to="/pricing">
+              <Button variant="outline">
+                <CreditCard className="mr-2 h-4 w-4" />
+                Abonnement
+              </Button>
+            </Link>
+            <Link to="/dashboard/restaurant/new">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Restaurant toevoegen
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {loading ? (
