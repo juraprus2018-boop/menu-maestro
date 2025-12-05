@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette } from "lucide-react";
 import { themes, MenuTheme } from "@/lib/menu-themes";
+import MenuPreview from "@/components/MenuPreview";
 
 const RestaurantForm = () => {
   const { id } = useParams();
@@ -183,7 +184,8 @@ const RestaurantForm = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <main className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="grid lg:grid-cols-[1fr,320px] gap-8">
         <Card>
           <CardHeader>
             <CardTitle className="font-serif">
@@ -310,6 +312,17 @@ const RestaurantForm = () => {
             </form>
           </CardContent>
         </Card>
+
+        {/* Live Preview */}
+        <div className="hidden lg:block sticky top-24 h-fit">
+          <MenuPreview
+            theme={theme}
+            restaurantName={name}
+            logoUrl={logoUrl}
+            introText={introText}
+          />
+        </div>
+        </div>
       </main>
     </div>
   );
