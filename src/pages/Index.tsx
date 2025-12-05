@@ -14,10 +14,10 @@ import {
   Users, 
   Zap,
   ArrowRight,
-  Star
+  Star,
+  ExternalLink,
+  MonitorSmartphone
 } from "lucide-react";
-import dashboardMockup from "@/assets/dashboard-mockup.png";
-import phoneMockup from "@/assets/phone-menu-mockup.png";
 import qrTableMockup from "@/assets/qr-table-mockup.png";
 
 const Index = () => {
@@ -56,60 +56,45 @@ const Index = () => {
       <section className="relative overflow-hidden py-16 md:py-24">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/20" />
         <div className="container mx-auto px-4 relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
-                <Zap className="h-3 w-3 mr-1" />
-                100% Gratis
-              </Badge>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 font-serif leading-tight">
-                Uw menukaart,{" "}
-                <span className="text-primary">digitaal</span> op tafel
-              </h1>
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl">
-                Creëer in enkele minuten een professionele digitale menukaart voor uw restaurant. 
-                Gasten scannen de QR-code en bekijken direct uw menu op hun telefoon.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/auth?mode=signup">
-                  <Button size="lg" className="w-full sm:w-auto text-lg px-8">
-                    Gratis beginnen
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link to="/menu/le-troubadour-valkenswaard">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg px-8">
-                    Bekijk demo
-                  </Button>
-                </Link>
-              </div>
-              <div className="flex items-center gap-6 mt-8 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-primary" />
-                  Geen creditcard nodig
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-primary" />
-                  Direct online
-                </div>
-              </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">
+              <Zap className="h-3 w-3 mr-1" />
+              100% Gratis
+            </Badge>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 font-serif leading-tight">
+              Uw menukaart,{" "}
+              <span className="text-primary">digitaal</span> op tafel
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Creëer in enkele minuten een professionele digitale menukaart voor uw restaurant. 
+              Gasten scannen de QR-code en bekijken direct uw menu op hun telefoon.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/auth?mode=signup">
+                <Button size="lg" className="w-full sm:w-auto text-lg px-8">
+                  Gratis beginnen
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/menu/le-troubadour-valkenswaard">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg px-8">
+                  <ExternalLink className="mr-2 h-5 w-5" />
+                  Bekijk live demo
+                </Button>
+              </Link>
             </div>
-            <div className="relative">
-              <img 
-                src={phoneMockup} 
-                alt="Digitale menukaart op telefoon" 
-                className="mx-auto max-w-xs md:max-w-sm rounded-3xl shadow-2xl"
-              />
-              <div className="absolute -bottom-4 -left-4 bg-card p-4 rounded-xl shadow-lg border border-border hidden md:block">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">500+</p>
-                    <p className="text-xs text-muted-foreground">Restaurants</p>
-                  </div>
-                </div>
+            <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-primary" />
+                Geen creditcard nodig
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-primary" />
+                Direct online
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-primary" />
+                Onbeperkt menu's
               </div>
             </div>
           </div>
@@ -164,16 +149,41 @@ const Index = () => {
             />
           </div>
 
-          {/* Dashboard Screenshot */}
-          <div className="bg-muted/30 rounded-2xl p-8 max-w-5xl mx-auto">
-            <h3 className="text-xl font-semibold mb-4 text-center font-serif">
-              Beheer alles vanuit één overzichtelijk dashboard
+          {/* Dashboard Preview */}
+          <div className="bg-muted/30 rounded-2xl p-8 max-w-4xl mx-auto">
+            <h3 className="text-xl font-semibold mb-6 text-center font-serif">
+              Wat u kunt doen in het dashboard
             </h3>
-            <img 
-              src={dashboardMockup} 
-              alt="Dashboard overzicht" 
-              className="rounded-xl shadow-lg border border-border w-full"
-            />
+            <div className="grid md:grid-cols-2 gap-6">
+              <DashboardFeature 
+                icon={<Settings className="h-6 w-6" />}
+                title="Restaurants beheren"
+                description="Voeg uw restaurant toe met logo en welkomsttekst"
+              />
+              <DashboardFeature 
+                icon={<QrCode className="h-6 w-6" />}
+                title="Meerdere menu's"
+                description="Maak verschillende menu's aan: Lunch, Diner, Drankkaart"
+              />
+              <DashboardFeature 
+                icon={<ChefHat className="h-6 w-6" />}
+                title="Gerechten toevoegen"
+                description="Voeg categorieën en gerechten toe met beschrijving en prijs"
+              />
+              <DashboardFeature 
+                icon={<MonitorSmartphone className="h-6 w-6" />}
+                title="QR-code downloaden"
+                description="Download uw QR-code en bekijk een preview van uw menu"
+              />
+            </div>
+            <div className="mt-8 text-center">
+              <Link to="/auth?mode=signup">
+                <Button>
+                  Probeer het zelf - Gratis
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -233,11 +243,11 @@ const Index = () => {
             <div>
               <Badge className="mb-4">Live Demo</Badge>
               <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">
-                Bekijk hoe het werkt
+                Bekijk hoe het eruitziet
               </h2>
               <p className="text-muted-foreground mb-6">
-                Probeer onze demo en ontdek hoe eenvoudig het is. Scan de QR-code of 
-                klik op de knop om de digitale menukaart te bekijken zoals uw gasten dat zouden doen.
+                Probeer onze live demo en ontdek hoe eenvoudig het is. Bekijk de digitale menukaart 
+                precies zoals uw gasten dat zouden doen na het scannen van de QR-code.
               </p>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3">
@@ -250,7 +260,7 @@ const Index = () => {
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary" />
-                  <span>Responsief design voor alle telefoons</span>
+                  <span>Responsive design voor alle telefoons</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary" />
@@ -259,8 +269,8 @@ const Index = () => {
               </ul>
               <Link to="/menu/le-troubadour-valkenswaard">
                 <Button size="lg">
-                  Bekijk de demo
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ExternalLink className="mr-2 h-5 w-5" />
+                  Bekijk de live demo
                 </Button>
               </Link>
             </div>
@@ -289,7 +299,7 @@ const Index = () => {
               alles online staan. En het beste? Het is helemaal gratis!"
             </blockquote>
             <p className="text-muted-foreground">
-              — Restaurant eigenaar, Valkenswaard
+              — Restaurant eigenaar
             </p>
           </div>
         </div>
@@ -435,6 +445,16 @@ const StepCard = ({ number, title, description }: { number: number; title: strin
     </div>
     <h3 className="text-lg font-semibold mb-2 font-serif">{title}</h3>
     <p className="text-muted-foreground text-sm">{description}</p>
+  </div>
+);
+
+const DashboardFeature = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
+  <div className="flex gap-4 p-4 bg-background rounded-lg border border-border">
+    <div className="text-primary flex-shrink-0">{icon}</div>
+    <div>
+      <h4 className="font-semibold mb-1">{title}</h4>
+      <p className="text-sm text-muted-foreground">{description}</p>
+    </div>
   </div>
 );
 
