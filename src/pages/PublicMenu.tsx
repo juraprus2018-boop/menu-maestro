@@ -8,7 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { Store, UtensilsCrossed, ArrowLeft, Filter, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getTheme, ThemeConfig } from "@/lib/menu-themes";
-import { getAllergenInfo, EU_ALLERGENS } from "@/components/AllergenSelector";
+import { getAllergenInfo } from "@/components/AllergenSelector";
+import LanguageSelector from "@/components/LanguageSelector";
 
 interface Restaurant {
   id: string;
@@ -17,6 +18,7 @@ interface Restaurant {
   intro_text: string | null;
   slug: string;
   theme: string | null;
+  enabled_languages: string[];
 }
 
 interface MenuType {
@@ -43,17 +45,37 @@ interface MenuItem {
   allergens: string[] | null;
 }
 
+interface Translation {
+  entity_type: string;
+  entity_id: string;
+  field_name: string;
+  language_code: string;
+  translation_text: string;
+}
+
 const PublicMenu = () => {
   const { slug, menuId } = useParams();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menu, setMenu] = useState<MenuType | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [translations, setTranslations] = useState<Translation[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [theme, setTheme] = useState<ThemeConfig>(getTheme('default'));
   const [excludedAllergens, setExcludedAllergens] = useState<string[]>([]);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState("nl");
+
+  // Get translation helper
+  const getTranslation = (entityType: string, entityId: string, fieldName: string, fallback: string) => {
+    if (currentLanguage === "nl") return fallback;
+    const translation = translations.find(
+      t => t.entity_type === entityType && t.entity_id === entityId && 
+           t.field_name === fieldName && t.language_code === currentLanguage
+    );
+    return translation?.translation_text || fallback;
+  };
 
   // Get all unique allergens used in this menu
   const availableAllergens = useMemo(() => {
@@ -84,6 +106,13 @@ const PublicMenu = () => {
   useEffect(() => {
     fetchMenu();
   }, [slug, menuId]);
+
+  // Fetch translations when language changes
+  useEffect(() => {
+    if (restaurant && currentLanguage !== "nl") {
+      fetchTranslations();
+    }
+  }, [currentLanguage, restaurant]);
 
   const fetchMenu = async () => {
     // Fetch restaurant by slug
@@ -142,6 +171,26 @@ const PublicMenu = () => {
     setLoading(false);
   };
 
+  const fetchTranslations = async () => {
+    if (!restaurant || !menu) return;
+
+    // Get all entity IDs we need translations for
+    const entityIds = [
+      restaurant.id,
+      menu.id,
+      ...categories.map(c => c.id),
+      ...menuItems.map(i => i.id),
+    ];
+
+    const { data } = await supabase
+      .from("translations")
+      .select("*")
+      .eq("language_code", currentLanguage)
+      .in("entity_id", entityIds);
+
+    setTranslations(data || []);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -166,17 +215,29 @@ const PublicMenu = () => {
     );
   }
 
+  const enabledLanguages = restaurant?.enabled_languages || [];
+
   return (
     <div className={`min-h-screen ${theme.bodyBg}`}>
       {/* Header */}
       <header className={`${theme.headerBg} ${theme.headerText} py-8`}>
         <div className="container mx-auto px-4">
-          <Link to={`/menu/${slug}`}>
-            <Button variant="ghost" size="sm" className={`mb-4 ${theme.headerText}/80 hover:${theme.headerText} hover:bg-white/10`}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Alle menu's
-            </Button>
-          </Link>
+          <div className="flex items-center justify-between mb-4">
+            <Link to={`/menu/${slug}`}>
+              <Button variant="ghost" size="sm" className={`${theme.headerText}/80 hover:${theme.headerText} hover:bg-white/10`}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Alle menu's
+              </Button>
+            </Link>
+            {enabledLanguages.length > 0 && (
+              <LanguageSelector
+                currentLanguage={currentLanguage}
+                availableLanguages={enabledLanguages}
+                onLanguageChange={setCurrentLanguage}
+                className="bg-white/10 border-white/20 text-inherit hover:bg-white/20"
+              />
+            )}
+          </div>
           <div className="text-center">
             {restaurant?.logo_url ? (
               <img
@@ -189,16 +250,20 @@ const PublicMenu = () => {
                 <UtensilsCrossed className="h-12 w-12" />
               </div>
             )}
-            <h1 className={`text-3xl md:text-4xl font-bold ${theme.titleFont}`}>{restaurant?.name}</h1>
-            <p className={`mt-2 text-xl opacity-90 ${theme.bodyFont}`}>{menu?.name}</p>
+            <h1 className={`text-3xl md:text-4xl font-bold ${theme.titleFont}`}>
+              {getTranslation("restaurant", restaurant?.id || "", "name", restaurant?.name || "")}
+            </h1>
+            <p className={`mt-2 text-xl opacity-90 ${theme.bodyFont}`}>
+              {getTranslation("menu", menu?.id || "", "name", menu?.name || "")}
+            </p>
             {menu?.description && (
               <p className={`mt-2 opacity-70 max-w-xl mx-auto ${theme.bodyFont}`}>
-                {menu.description}
+                {getTranslation("menu", menu.id, "description", menu.description)}
               </p>
             )}
             {restaurant?.intro_text && (
               <p className={`mt-4 opacity-80 max-w-xl mx-auto text-sm ${theme.bodyFont}`}>
-                {restaurant.intro_text}
+                {getTranslation("restaurant", restaurant.id, "intro_text", restaurant.intro_text)}
               </p>
             )}
           </div>
@@ -290,11 +355,11 @@ const PublicMenu = () => {
                 <section key={category.id}>
                   <div className="mb-4">
                     <h2 className={`text-2xl font-bold ${theme.titleFont} ${theme.accentColor}`}>
-                      {category.name}
+                      {getTranslation("category", category.id, "name", category.name)}
                     </h2>
                     {category.description && (
                       <p className={`text-muted-foreground text-sm mt-1 ${theme.bodyFont}`}>
-                        {category.description}
+                        {getTranslation("category", category.id, "description", category.description)}
                       </p>
                     )}
                   </div>
@@ -304,11 +369,11 @@ const PublicMenu = () => {
                         <div className="flex justify-between items-start gap-4 py-3">
                           <div className="flex-1">
                             <h3 className={`font-medium ${theme.accentColor} ${theme.bodyFont}`}>
-                              {item.name}
+                              {getTranslation("item", item.id, "name", item.name)}
                             </h3>
                             {item.description && (
                               <p className={`text-sm text-muted-foreground mt-1 ${theme.bodyFont}`}>
-                                {item.description}
+                                {getTranslation("item", item.id, "description", item.description)}
                               </p>
                             )}
                             {item.allergens && item.allergens.length > 0 && (

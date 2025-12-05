@@ -63,17 +63,19 @@ serve(async (req) => {
     let plan = null;
     let subscriptionEnd = null;
     let priceId = null;
+    let productId = null;
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       priceId = subscription.items.data[0].price.id;
+      productId = subscription.items.data[0].price.product as string;
       
       // Determine plan type based on interval
       const interval = subscription.items.data[0].price.recurring?.interval;
       plan = interval === "year" ? "yearly" : "monthly";
       
-      logStep("Active subscription found", { subscriptionId: subscription.id, plan, endDate: subscriptionEnd });
+      logStep("Active subscription found", { subscriptionId: subscription.id, plan, productId, endDate: subscriptionEnd });
 
       // Update subscription in our database
       const { error: upsertError } = await supabaseClient
@@ -103,6 +105,7 @@ serve(async (req) => {
       subscribed: hasActiveSub,
       plan: plan,
       price_id: priceId,
+      product_id: productId,
       subscription_end: subscriptionEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
