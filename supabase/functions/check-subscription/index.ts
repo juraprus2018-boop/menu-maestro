@@ -56,7 +56,7 @@ serve(async (req) => {
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
-      limit: 1,
+      limit: 10,
     });
 
     const hasActiveSub = subscriptions.data.length > 0;
@@ -64,18 +64,34 @@ serve(async (req) => {
     let subscriptionEnd = null;
     let priceId = null;
     let productId = null;
+    const productIds: string[] = [];
 
     if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      priceId = subscription.items.data[0].price.id;
-      productId = subscription.items.data[0].price.product as string;
+      // Collect all product IDs from all active subscriptions
+      for (const subscription of subscriptions.data) {
+        for (const item of subscription.items.data) {
+          const prodId = item.price.product as string;
+          if (!productIds.includes(prodId)) {
+            productIds.push(prodId);
+          }
+        }
+      }
+
+      // Use the first non-ordering subscription for main plan info
+      const mainSubscription = subscriptions.data.find((sub: { items: { data: { price: { product: string } }[] } }) => {
+        const prodId = sub.items.data[0].price.product as string;
+        return prodId !== "prod_TYAfzP0Dw0QUCD"; // Not the ordering product
+      }) || subscriptions.data[0];
+
+      subscriptionEnd = new Date(mainSubscription.current_period_end * 1000).toISOString();
+      priceId = mainSubscription.items.data[0].price.id;
+      productId = mainSubscription.items.data[0].price.product as string;
       
       // Determine plan type based on interval
-      const interval = subscription.items.data[0].price.recurring?.interval;
+      const interval = mainSubscription.items.data[0].price.recurring?.interval;
       plan = interval === "year" ? "yearly" : "monthly";
       
-      logStep("Active subscription found", { subscriptionId: subscription.id, plan, productId, endDate: subscriptionEnd });
+      logStep("Active subscriptions found", { count: subscriptions.data.length, productIds, plan, endDate: subscriptionEnd });
 
       // Update subscription in our database
       const { error: upsertError } = await supabaseClient
@@ -106,6 +122,7 @@ serve(async (req) => {
       plan: plan,
       price_id: priceId,
       product_id: productId,
+      product_ids: productIds,
       subscription_end: subscriptionEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -14,6 +14,8 @@ import MenuManager from "./pages/MenuManager";
 import QRCode from "./pages/QRCode";
 import RestaurantMenuOverview from "./pages/RestaurantMenuOverview";
 import PublicMenu from "./pages/PublicMenu";
+import OrdersDashboard from "./pages/OrdersDashboard";
+import OrderingSettings from "./pages/OrderingSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +37,8 @@ const App = () => (
           <Route path="/dashboard/restaurant/:id/menus" element={<MenuList />} />
           <Route path="/dashboard/restaurant/:id/menu/:menuId" element={<MenuManager />} />
           <Route path="/dashboard/restaurant/:id/qr" element={<QRCode />} />
+          <Route path="/dashboard/restaurant/:id/orders" element={<OrdersDashboard />} />
+          <Route path="/dashboard/restaurant/:id/ordering-settings" element={<OrderingSettings />} />
           <Route path="/menu/:slug" element={<RestaurantMenuOverview />} />
           <Route path="/menu/:slug/:menuId" element={<PublicMenu />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

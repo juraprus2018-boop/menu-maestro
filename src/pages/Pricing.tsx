@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Check, Loader2, CreditCard, Globe } from "lucide-react";
+import { ArrowLeft, Check, Loader2, CreditCard, Globe, ShoppingBag } from "lucide-react";
 import { PLANS, SUBSCRIPTION_TIERS, getTierFromProductId, SubscriptionTier } from "@/lib/subscription-tiers";
 
 const Pricing = () => {
@@ -19,6 +19,7 @@ const Pricing = () => {
     tier: SubscriptionTier;
     plan: string | null;
     subscription_end: string | null;
+    hasOrdering?: boolean;
   } | null>(null);
   const [checkingSubscription, setCheckingSubscription] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -50,7 +51,8 @@ const Pricing = () => {
       const { data, error } = await supabase.functions.invoke("check-subscription");
       if (error) throw error;
       const tier = getTierFromProductId(data.product_id);
-      setSubscription({ ...data, tier });
+      const hasOrdering = data.product_ids?.includes("prod_TYAfzP0Dw0QUCD") || false;
+      setSubscription({ ...data, tier, hasOrdering });
     } catch (error) {
       console.error("Error checking subscription:", error);
     } finally {
@@ -328,6 +330,54 @@ const Pricing = () => {
                 </div>
               </TabsContent>
             </Tabs>
+
+            {/* Ordering Add-on */}
+            <div className="max-w-2xl mx-auto mt-12">
+              <h3 className="text-2xl font-bold font-serif text-center mb-6">Extra module</h3>
+              <Card className={`relative ${subscription?.hasOrdering ? "ring-2 ring-primary" : "border-dashed"}`}>
+                {subscription?.hasOrdering && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Actief</Badge>
+                )}
+                <CardHeader>
+                  <CardTitle className="font-serif flex items-center gap-2">
+                    <ShoppingBag className="h-5 w-5 text-primary" />
+                    Bestellen
+                  </CardTitle>
+                  <CardDescription>Laat gasten online bestellen via jouw menukaart</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-6">
+                    <span className="text-4xl font-bold">€{PLANS.ordering_monthly.price.toFixed(2).replace(".", ",")}</span>
+                    <span className="text-muted-foreground">/maand</span>
+                  </div>
+                  <ul className="space-y-3">
+                    {SUBSCRIPTION_TIERS.ordering.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2">
+                        <Check className="h-5 w-5 text-primary" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  {subscription?.hasOrdering ? (
+                    <Button className="w-full" variant="outline" onClick={handleManageSubscription} disabled={loading === "manage"}>
+                      {loading === "manage" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
+                      Beheer abonnement
+                    </Button>
+                  ) : (
+                    <Button 
+                      className="w-full" 
+                      onClick={() => handleSubscribe("ordering_monthly")} 
+                      disabled={loading === "ordering_monthly" || !subscription?.subscribed}
+                    >
+                      {loading === "ordering_monthly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                      {!subscription?.subscribed ? "Eerst basis abonnement nodig" : "Voeg Bestellen toe"}
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            </div>
 
             <div className="text-center mt-12">
               <p className="text-muted-foreground">
