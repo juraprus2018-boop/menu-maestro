@@ -22,6 +22,18 @@ export const SUBSCRIPTION_TIERS = {
       "Taalkeuzeschakelaar voor gasten",
     ],
   },
+  ordering: {
+    name: "Bestellen",
+    productIds: ["prod_TYAfzP0Dw0QUCD"],
+    features: [
+      "Online bestellingen ontvangen",
+      "Afhalen & bezorging",
+      "Bestellingendashboard",
+      "Betaling met iDEAL, contant of pin",
+      "Bereidingstijden instellen",
+      "Bestelstatus beheren",
+    ],
+  },
 } as const;
 
 export const PLANS = {
@@ -63,6 +75,16 @@ export const PLANS = {
     description: "Bespaar 17%",
     savings: "Bespaar €30",
   },
+  ordering_monthly: {
+    tier: "ordering" as const,
+    name: "Bestellen Maandelijks",
+    price: 29.50,
+    priceId: "price_1Sb4JmLmpOLDgj0kJJo4LAHj",
+    productId: "prod_TYAfzP0Dw0QUCD",
+    interval: "maand",
+    description: "Extra module voor online bestellingen",
+    isAddon: true,
+  },
 };
 
 export const SUPPORTED_LANGUAGES = [
@@ -73,11 +95,16 @@ export const SUPPORTED_LANGUAGES = [
 ] as const;
 
 export type LanguageCode = typeof SUPPORTED_LANGUAGES[number]["code"];
-export type SubscriptionTier = "basic" | "pro" | null;
+export type SubscriptionTier = "basic" | "pro" | "ordering" | null;
 
 export function getTierFromProductId(productId: string | null): SubscriptionTier {
   if (!productId) return null;
+  if (SUBSCRIPTION_TIERS.ordering.productIds.includes(productId as any)) return "ordering";
   if (SUBSCRIPTION_TIERS.pro.productIds.includes(productId as any)) return "pro";
   if (SUBSCRIPTION_TIERS.basic.productIds.includes(productId as any)) return "basic";
   return null;
+}
+
+export function hasOrderingSubscription(productIds: string[]): boolean {
+  return productIds.some(id => SUBSCRIPTION_TIERS.ordering.productIds.includes(id as any));
 }

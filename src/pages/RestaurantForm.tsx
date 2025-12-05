@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette, Globe } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette, Globe, ShoppingBag } from "lucide-react";
 import { themes, MenuTheme } from "@/lib/menu-themes";
 import MenuPreview from "@/components/MenuPreview";
 import LanguageSettings from "@/components/LanguageSettings";
@@ -317,18 +317,26 @@ const RestaurantForm = () => {
                     </RadioGroup>
                   </div>
 
-                  <div className="flex gap-4 pt-4">
+                  <div className="flex flex-wrap gap-4 pt-4">
                     <Button type="submit" disabled={loading || uploading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       {isEditing ? "Opslaan" : "Restaurant aanmaken"}
                     </Button>
                     {isEditing && (
-                      <Link to={`/dashboard/restaurant/${id}/menus`}>
-                        <Button type="button" variant="outline">
-                          <Menu className="mr-2 h-4 w-4" />
-                          Menu's beheren
-                        </Button>
-                      </Link>
+                      <>
+                        <Link to={`/dashboard/restaurant/${id}/menus`}>
+                          <Button type="button" variant="outline">
+                            <Menu className="mr-2 h-4 w-4" />
+                            Menu's beheren
+                          </Button>
+                        </Link>
+                        <Link to={`/dashboard/restaurant/${id}/orders`}>
+                          <Button type="button" variant="outline">
+                            <ShoppingBag className="mr-2 h-4 w-4" />
+                            Bestellingen
+                          </Button>
+                        </Link>
+                      </>
                     )}
                   </div>
                 </form>
