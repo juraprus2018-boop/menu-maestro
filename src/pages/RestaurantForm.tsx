@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette } from "lucide-react";
 import { themes, MenuTheme } from "@/lib/menu-themes";
 import MenuPreview from "@/components/MenuPreview";
+import LanguageSettings from "@/components/LanguageSettings";
 
 const RestaurantForm = () => {
   const { id } = useParams();
@@ -20,6 +21,7 @@ const RestaurantForm = () => {
   const [introText, setIntroText] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [theme, setTheme] = useState<MenuTheme>("default");
+  const [enabledLanguages, setEnabledLanguages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
@@ -51,6 +53,7 @@ const RestaurantForm = () => {
       setIntroText(data.intro_text || "");
       setLogoUrl(data.logo_url);
       setTheme((data.theme as MenuTheme) || "default");
+      setEnabledLanguages(data.enabled_languages || []);
     }
   };
 
@@ -186,142 +189,153 @@ const RestaurantForm = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="grid lg:grid-cols-[1fr,320px] gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-serif">
-              {isEditing ? "Restaurant bewerken" : "Nieuw restaurant toevoegen"}
-            </CardTitle>
-            <CardDescription>
-              Vul de gegevens van uw restaurant in
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Naam restaurant *</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={handleNameChange}
-                  placeholder="Bijv. Restaurant De Gouden Lepel"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="slug">URL (slug) *</Label>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-sm">/menu/</span>
-                  <Input
-                    id="slug"
-                    value={slug}
-                    onChange={(e) => setSlug(generateSlug(e.target.value))}
-                    placeholder="mijn-restaurant"
-                    required
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Dit wordt de basis-link naar uw menu's
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="intro">Introductietekst</Label>
-                <Textarea
-                  id="intro"
-                  value={introText}
-                  onChange={(e) => setIntroText(e.target.value)}
-                  placeholder="Welkom bij ons restaurant! Bekijk onze heerlijke gerechten..."
-                  rows={3}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Logo</Label>
-                <div className="flex items-center gap-4">
-                  {logoUrl ? (
-                    <img
-                      src={logoUrl}
-                      alt="Logo"
-                      className="w-20 h-20 rounded-lg object-cover border border-border"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 rounded-lg bg-muted flex items-center justify-center border border-border">
-                      <Upload className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div>
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-serif">
+                  {isEditing ? "Restaurant bewerken" : "Nieuw restaurant toevoegen"}
+                </CardTitle>
+                <CardDescription>
+                  Vul de gegevens van uw restaurant in
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Naam restaurant *</Label>
                     <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoUpload}
-                      className="max-w-xs"
-                      disabled={uploading}
+                      id="name"
+                      value={name}
+                      onChange={handleNameChange}
+                      placeholder="Bijv. Restaurant De Gouden Lepel"
+                      required
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Aanbevolen: vierkant, minimaal 200x200px
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="slug">URL (slug) *</Label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground text-sm">/menu/</span>
+                      <Input
+                        id="slug"
+                        value={slug}
+                        onChange={(e) => setSlug(generateSlug(e.target.value))}
+                        placeholder="mijn-restaurant"
+                        required
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Dit wordt de basis-link naar uw menu's
                     </p>
                   </div>
-                </div>
-              </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Palette className="h-5 w-5 text-primary" />
-                  <Label>Menu template</Label>
-                </div>
-                <RadioGroup value={theme} onValueChange={(value) => setTheme(value as MenuTheme)}>
-                  <div className="grid gap-4">
-                    {(Object.keys(themes) as MenuTheme[]).map((themeKey) => {
-                      const themeConfig = themes[themeKey];
-                      return (
-                        <div key={themeKey} className="flex items-center space-x-3">
-                          <RadioGroupItem value={themeKey} id={themeKey} />
-                          <Label htmlFor={themeKey} className="flex-1 cursor-pointer">
-                            <div className="flex items-center gap-4">
-                              <div className={`w-12 h-12 rounded-lg ${themeConfig.headerBg} flex items-center justify-center`}>
-                                <span className={`text-xs font-bold ${themeConfig.headerText}`}>Aa</span>
-                              </div>
-                              <div>
-                                <p className="font-semibold">{themeConfig.name}</p>
-                                <p className="text-sm text-muted-foreground">{themeConfig.description}</p>
-                              </div>
-                            </div>
-                          </Label>
-                        </div>
-                      );
-                    })}
+                  <div className="space-y-2">
+                    <Label htmlFor="intro">Introductietekst</Label>
+                    <Textarea
+                      id="intro"
+                      value={introText}
+                      onChange={(e) => setIntroText(e.target.value)}
+                      placeholder="Welkom bij ons restaurant! Bekijk onze heerlijke gerechten..."
+                      rows={3}
+                    />
                   </div>
-                </RadioGroup>
-              </div>
 
-              <div className="flex gap-4 pt-4">
-                <Button type="submit" disabled={loading || uploading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isEditing ? "Opslaan" : "Restaurant aanmaken"}
-                </Button>
-                {isEditing && (
-                  <Link to={`/dashboard/restaurant/${id}/menus`}>
-                    <Button type="button" variant="outline">
-                      <Menu className="mr-2 h-4 w-4" />
-                      Menu's beheren
+                  <div className="space-y-2">
+                    <Label>Logo</Label>
+                    <div className="flex items-center gap-4">
+                      {logoUrl ? (
+                        <img
+                          src={logoUrl}
+                          alt="Logo"
+                          className="w-20 h-20 rounded-lg object-cover border border-border"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-lg bg-muted flex items-center justify-center border border-border">
+                          <Upload className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoUpload}
+                          className="max-w-xs"
+                          disabled={uploading}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Aanbevolen: vierkant, minimaal 200x200px
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Palette className="h-5 w-5 text-primary" />
+                      <Label>Menu template</Label>
+                    </div>
+                    <RadioGroup value={theme} onValueChange={(value) => setTheme(value as MenuTheme)}>
+                      <div className="grid gap-4">
+                        {(Object.keys(themes) as MenuTheme[]).map((themeKey) => {
+                          const themeConfig = themes[themeKey];
+                          return (
+                            <div key={themeKey} className="flex items-center space-x-3">
+                              <RadioGroupItem value={themeKey} id={themeKey} />
+                              <Label htmlFor={themeKey} className="flex-1 cursor-pointer">
+                                <div className="flex items-center gap-4">
+                                  <div className={`w-12 h-12 rounded-lg ${themeConfig.headerBg} flex items-center justify-center`}>
+                                    <span className={`text-xs font-bold ${themeConfig.headerText}`}>Aa</span>
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold">{themeConfig.name}</p>
+                                    <p className="text-sm text-muted-foreground">{themeConfig.description}</p>
+                                  </div>
+                                </div>
+                              </Label>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <Button type="submit" disabled={loading || uploading}>
+                      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {isEditing ? "Opslaan" : "Restaurant aanmaken"}
                     </Button>
-                  </Link>
-                )}
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                    {isEditing && (
+                      <Link to={`/dashboard/restaurant/${id}/menus`}>
+                        <Button type="button" variant="outline">
+                          <Menu className="mr-2 h-4 w-4" />
+                          Menu's beheren
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
 
-        {/* Live Preview */}
-        <div className="hidden lg:block sticky top-24 h-fit">
-          <MenuPreview
-            theme={theme}
-            restaurantName={name}
-            logoUrl={logoUrl}
-            introText={introText}
-          />
-        </div>
+            {/* Language Settings - only show when editing */}
+            {isEditing && id && (
+              <LanguageSettings
+                restaurantId={id}
+                enabledLanguages={enabledLanguages}
+                onLanguagesChange={setEnabledLanguages}
+              />
+            )}
+          </div>
+
+          {/* Live Preview */}
+          <div className="hidden lg:block sticky top-24 h-fit">
+            <MenuPreview
+              theme={theme}
+              restaurantName={name}
+              logoUrl={logoUrl}
+              introText={introText}
+            />
+          </div>
         </div>
       </main>
     </div>

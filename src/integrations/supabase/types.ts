@@ -177,6 +177,7 @@ export type Database = {
       restaurants: {
         Row: {
           created_at: string
+          enabled_languages: string[]
           id: string
           intro_text: string | null
           logo_url: string | null
@@ -188,6 +189,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          enabled_languages?: string[]
           id?: string
           intro_text?: string | null
           logo_url?: string | null
@@ -199,6 +201,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          enabled_languages?: string[]
           id?: string
           intro_text?: string | null
           logo_url?: string | null
@@ -240,6 +243,39 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          field_name: string
+          id: string
+          language_code: string
+          translation_text: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          field_name: string
+          id?: string
+          language_code: string
+          translation_text: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          field_name?: string
+          id?: string
+          language_code?: string
+          translation_text?: string
+          updated_at?: string
         }
         Relationships: []
       }
