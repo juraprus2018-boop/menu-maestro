@@ -164,6 +164,20 @@ const MenuList = () => {
               </span>
             </div>
           </div>
+          <div className="flex items-center gap-2">
+            <Link to={`/menu/${restaurant?.slug}`} target="_blank">
+              <Button variant="outline" size="sm">
+                <Eye className="mr-2 h-4 w-4" />
+                Bekijk
+              </Button>
+            </Link>
+            <Link to={`/dashboard/restaurant/${restaurantId}/qr`}>
+              <Button size="sm">
+                <QrCode className="mr-2 h-4 w-4" />
+                QR-code
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -231,11 +245,6 @@ const MenuList = () => {
                       <Button variant="outline" className="w-full">
                         <Settings className="mr-2 h-4 w-4" />
                         Gerechten beheren
-                      </Button>
-                    </Link>
-                    <Link to={`/dashboard/restaurant/${restaurantId}/menu/${menu.id}/qr`}>
-                      <Button variant="outline" size="icon">
-                        <QrCode className="h-4 w-4" />
                       </Button>
                     </Link>
                     <Link to={`/menu/${restaurant?.slug}/${menu.id}`} target="_blank">
