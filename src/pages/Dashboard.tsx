@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, QrCode, LogOut, Settings, Store } from "lucide-react";
+import { Plus, QrCode, LogOut, Settings, Store, Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Restaurant {
@@ -91,7 +91,7 @@ const Dashboard = () => {
           <div>
             <h1 className="text-3xl font-bold font-serif">Mijn Restaurants</h1>
             <p className="text-muted-foreground mt-1">
-              Beheer uw restaurants en menukaarten
+              Beheer uw restaurants en menu's
             </p>
           </div>
           <Link to="/dashboard/restaurant/new">
@@ -119,7 +119,7 @@ const Dashboard = () => {
               <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
               <h2 className="text-xl font-semibold mb-2">Nog geen restaurants</h2>
               <p className="text-muted-foreground mb-6">
-                Voeg uw eerste restaurant toe om te beginnen met uw digitale menukaart.
+                Voeg uw eerste restaurant toe om te beginnen met uw digitale menukaarten.
               </p>
               <Link to="/dashboard/restaurant/new">
                 <Button>
@@ -158,15 +158,15 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-2">
-                    <Link to={`/dashboard/restaurant/${restaurant.id}`} className="flex-1">
+                    <Link to={`/dashboard/restaurant/${restaurant.id}/menus`} className="flex-1">
                       <Button variant="outline" className="w-full">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Beheren
+                        <Menu className="mr-2 h-4 w-4" />
+                        Menu's
                       </Button>
                     </Link>
-                    <Link to={`/dashboard/restaurant/${restaurant.id}/qr`}>
+                    <Link to={`/dashboard/restaurant/${restaurant.id}`}>
                       <Button variant="outline" size="icon">
-                        <QrCode className="h-4 w-4" />
+                        <Settings className="h-4 w-4" />
                       </Button>
                     </Link>
                   </div>

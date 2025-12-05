@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Store, UtensilsCrossed } from "lucide-react";
@@ -12,6 +12,12 @@ interface Restaurant {
   logo_url: string | null;
   intro_text: string | null;
   slug: string;
+}
+
+interface MenuType {
+  id: string;
+  name: string;
+  description: string | null;
 }
 
 interface Category {
@@ -32,8 +38,9 @@ interface MenuItem {
 }
 
 const PublicMenu = () => {
-  const { slug } = useParams();
+  const { slug, menuId } = useParams();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [menu, setMenu] = useState<MenuType | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +48,7 @@ const PublicMenu = () => {
 
   useEffect(() => {
     fetchMenu();
-  }, [slug]);
+  }, [slug, menuId]);
 
   const fetchMenu = async () => {
     // Fetch restaurant by slug
@@ -59,11 +66,27 @@ const PublicMenu = () => {
 
     setRestaurant(restaurantData);
 
+    // Fetch menu
+    const { data: menuData, error: menuError } = await supabase
+      .from("menus")
+      .select("*")
+      .eq("id", menuId)
+      .eq("restaurant_id", restaurantData.id)
+      .maybeSingle();
+
+    if (menuError || !menuData) {
+      setNotFound(true);
+      setLoading(false);
+      return;
+    }
+
+    setMenu(menuData);
+
     // Fetch categories
     const { data: categoriesData } = await supabase
       .from("menu_categories")
       .select("*")
-      .eq("restaurant_id", restaurantData.id)
+      .eq("menu_id", menuId)
       .order("sort_order");
 
     setCategories(categoriesData || []);
@@ -99,7 +122,7 @@ const PublicMenu = () => {
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2 font-serif">Menu niet gevonden</h1>
             <p className="text-muted-foreground">
-              Dit restaurant bestaat niet of de link is onjuist.
+              Dit menu bestaat niet of de link is onjuist.
             </p>
           </CardContent>
         </Card>
@@ -124,8 +147,14 @@ const PublicMenu = () => {
             </div>
           )}
           <h1 className="text-3xl md:text-4xl font-bold font-serif">{restaurant?.name}</h1>
+          <p className="mt-2 text-xl text-primary-foreground/90">{menu?.name}</p>
+          {menu?.description && (
+            <p className="mt-2 text-primary-foreground/70 max-w-xl mx-auto">
+              {menu.description}
+            </p>
+          )}
           {restaurant?.intro_text && (
-            <p className="mt-4 text-primary-foreground/80 max-w-xl mx-auto">
+            <p className="mt-4 text-primary-foreground/80 max-w-xl mx-auto text-sm">
               {restaurant.intro_text}
             </p>
           )}

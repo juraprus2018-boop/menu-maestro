@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Upload, QrCode } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, QrCode, Menu } from "lucide-react";
 
 const RestaurantForm = () => {
   const { id } = useParams();
@@ -214,7 +214,7 @@ const RestaurantForm = () => {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Dit wordt de link naar uw menukaart: digitalemenukaart.nl/menu/{slug || "..."}
+                  Dit wordt de basis-link naar uw menu's
                 </p>
               </div>
 
@@ -264,9 +264,10 @@ const RestaurantForm = () => {
                   {isEditing ? "Opslaan" : "Restaurant aanmaken"}
                 </Button>
                 {isEditing && (
-                  <Link to={`/dashboard/restaurant/${id}/menu`}>
+                  <Link to={`/dashboard/restaurant/${id}/menus`}>
                     <Button type="button" variant="outline">
-                      Menu beheren
+                      <Menu className="mr-2 h-4 w-4" />
+                      Menu's beheren
                     </Button>
                   </Link>
                 )}
