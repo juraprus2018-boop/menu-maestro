@@ -512,6 +512,7 @@ const PublicMenu = () => {
             items={cart.items}
             subtotal={cart.subtotal}
             restaurantId={restaurant?.id || ""}
+            restaurantName={restaurant?.name || ""}
             orderingSettings={orderingSettings}
             onOrderComplete={handleOrderComplete}
           />

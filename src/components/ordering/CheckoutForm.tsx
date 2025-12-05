@@ -27,6 +27,7 @@ interface CheckoutFormProps {
   items: CartItem[];
   subtotal: number;
   restaurantId: string;
+  restaurantName: string;
   orderingSettings: OrderingSettings;
   onOrderComplete: () => void;
 }
@@ -37,6 +38,7 @@ export function CheckoutForm({
   items,
   subtotal,
   restaurantId,
+  restaurantName,
   orderingSettings,
   onOrderComplete,
 }: CheckoutFormProps) {
@@ -117,7 +119,31 @@ export function CheckoutForm({
 
       if (itemsError) throw itemsError;
 
-      // Send email notifications (don't await - fire and forget)
+      // Handle iDEAL payment - redirect to Stripe
+      if (paymentMethod === "ideal") {
+        const { data: paymentData, error: paymentError } = await supabase.functions.invoke(
+          "create-order-payment",
+          {
+            body: {
+              orderId: order.id,
+              customerEmail: customerEmail || undefined,
+              customerName,
+              totalAmount: total,
+              restaurantName,
+            },
+          }
+        );
+
+        if (paymentError || !paymentData?.url) {
+          throw new Error("Kon betaallink niet aanmaken");
+        }
+
+        // Redirect to Stripe Checkout
+        window.location.href = paymentData.url;
+        return;
+      }
+
+      // For cash/card payments, send notifications and complete
       supabase.functions.invoke("send-order-notification", {
         body: { orderId: order.id, restaurantId },
       }).catch((err) => console.error("Error sending order notification:", err));
@@ -300,10 +326,12 @@ export function CheckoutForm({
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Bestelling plaatsen...
+                {paymentMethod === "ideal" ? "Doorsturen naar iDEAL..." : "Bestelling plaatsen..."}
               </>
             ) : (
-              `Bestelling plaatsen (€${total.toFixed(2)})`
+              paymentMethod === "ideal" 
+                ? `Betalen met iDEAL (€${total.toFixed(2)})`
+                : `Bestelling plaatsen (€${total.toFixed(2)})`
             )}
           </Button>
         </form>
