@@ -66,7 +66,7 @@ export const themes: Record<MenuTheme, ThemeConfig> = {
 };
 
 export const getTheme = (themeName: string | null | undefined): ThemeConfig => {
-  if (themeName && themeName in themes) {
+  if (themeName && themes[themeName as MenuTheme]) {
     return themes[themeName as MenuTheme];
   }
   return themes.default;
