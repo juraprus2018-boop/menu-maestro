@@ -15,10 +15,16 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const HowItWorks = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Hoe werkt het"
+        description="Ontdek hoe eenvoudig u een digitale menukaart maakt. In 4 stappen online met QR-code. Bekijk hoe het werkt en start vandaag nog."
+        canonicalUrl="/hoe-werkt-het"
+      />
       <Navbar />
 
       {/* Header */}

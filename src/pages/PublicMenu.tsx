@@ -14,6 +14,7 @@ import { CartDrawer } from "@/components/ordering/CartDrawer";
 import { CheckoutForm } from "@/components/ordering/CheckoutForm";
 import { toast } from "sonner";
 import { isRestaurantOpen, OpeningHours } from "@/components/OpeningHoursEditor";
+import SEO from "@/components/SEO";
 
 interface Restaurant {
   id: string;

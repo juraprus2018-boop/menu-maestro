@@ -1,11 +1,16 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const Terms = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO 
+        title="Algemene Voorwaarden"
+        description="Lees onze algemene voorwaarden voor het gebruik van de digitale menukaart dienst."
+        canonicalUrl="/algemene-voorwaarden"
+      />
       <Navbar />
-
       {/* Header */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-transparent to-accent/20">
         <div className="container mx-auto px-4 text-center">

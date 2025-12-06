@@ -14,10 +14,16 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const QRMenuOrderingPage = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="QR Menu + Online Bestellen"
+        description="Combineer uw digitale menukaart met online bestellen. Ontvang bestellingen voor afhalen en bezorgen direct in uw dashboard."
+        canonicalUrl="/oplossingen/qr-menu-bestellen"
+      />
       <Navbar />
 
       {/* Hero Section */}
