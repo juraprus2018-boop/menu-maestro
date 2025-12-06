@@ -16,7 +16,9 @@ import {
   ArrowRight,
   Star,
   ExternalLink,
-  MonitorSmartphone
+  MonitorSmartphone,
+  ShoppingBag,
+  Truck
 } from "lucide-react";
 import qrTableMockup from "@/assets/qr-table-mockup.png";
 import screenshotDashboard from "@/assets/screenshot-dashboard.png";
@@ -351,6 +353,16 @@ const Index = () => {
               icon={<Euro className="h-8 w-8" />}
               title="Betaalbaar"
               description="30 dagen gratis uitproberen. Daarna vanaf €9/maand of €95/jaar. Geen verborgen kosten."
+            />
+            <FeatureCard
+              icon={<ShoppingBag className="h-8 w-8" />}
+              title="Online bestellen"
+              description="Laat gasten direct bestellen via de digitale menukaart. Ontvang bestellingen in uw dashboard."
+            />
+            <FeatureCard
+              icon={<Truck className="h-8 w-8" />}
+              title="Take away & bezorgen"
+              description="Bied afhalen en bezorgen aan. Stel bezorgkosten, minimale bestelbedragen en bereidingstijden in."
             />
           </div>
         </div>
