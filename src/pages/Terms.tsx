@@ -1,27 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { QrCode } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const Terms = () => {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <QrCode className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground font-serif">Digitale Menukaart</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link to="/auth">
-              <Button variant="ghost">Inloggen</Button>
-            </Link>
-            <Link to="/auth?mode=signup">
-              <Button>30 dagen gratis</Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
 
       {/* Header */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-transparent to-accent/20">
@@ -36,7 +19,7 @@ const Terms = () => {
       </section>
 
       {/* Content */}
-      <section className="py-16">
+      <section className="py-16 flex-1">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto prose prose-gray dark:prose-invert">
             <h2>Artikel 1 - Definities</h2>
@@ -130,22 +113,7 @@ const Terms = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-card border-t border-border py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <QrCode className="h-6 w-6 text-primary" />
-              <span className="font-bold font-serif">Digitale Menukaart</span>
-            </div>
-            <div className="flex gap-6 text-sm text-muted-foreground">
-              <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
-              <Link to="/algemene-voorwaarden" className="hover:text-foreground">Algemene voorwaarden</Link>
-              <Link to="/contact" className="hover:text-foreground">Contact</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
