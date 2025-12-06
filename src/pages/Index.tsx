@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,14 +19,31 @@ import {
   ExternalLink,
   MonitorSmartphone,
   ShoppingBag,
-  Truck
+  Truck,
+  Menu,
+  X,
+  ChevronDown
 } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import qrTableMockup from "@/assets/qr-table-mockup.png";
 import screenshotDashboard from "@/assets/screenshot-dashboard.png";
 import screenshotMenu from "@/assets/screenshot-menu.png";
 import screenshotQrcode from "@/assets/screenshot-qrcode.png";
 
 const Index = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [solutionsOpen, setSolutionsOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -35,6 +53,8 @@ const Index = () => {
             <QrCode className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold text-foreground font-serif">Digitale Menukaart</span>
           </Link>
+          
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             <div className="relative group">
               <button className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
@@ -65,13 +85,95 @@ const Index = () => {
               Contact
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          
+          {/* Desktop Buttons */}
+          <div className="hidden md:flex items-center gap-4">
             <Link to="/auth">
               <Button variant="ghost">Inloggen</Button>
             </Link>
             <Link to="/auth?mode=signup">
               <Button>30 dagen gratis</Button>
             </Link>
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="md:hidden flex items-center gap-2">
+            <Link to="/auth?mode=signup">
+              <Button size="sm">Gratis proberen</Button>
+            </Link>
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] bg-card">
+                <div className="flex flex-col gap-4 mt-8">
+                  {/* Oplossingen Dropdown */}
+                  <Collapsible open={solutionsOpen} onOpenChange={setSolutionsOpen}>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-lg font-medium hover:text-primary transition-colors">
+                      Oplossingen
+                      <ChevronDown className={`h-5 w-5 transition-transform ${solutionsOpen ? 'rotate-180' : ''}`} />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pl-4 space-y-2 mt-2">
+                      <SheetClose asChild>
+                        <Link 
+                          to="/oplossingen/qr-menu" 
+                          className="block py-2 text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          QR Menu
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link 
+                          to="/oplossingen/qr-menu-bestellen" 
+                          className="block py-2 text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          QR Menu + Bestellen
+                        </Link>
+                      </SheetClose>
+                    </CollapsibleContent>
+                  </Collapsible>
+                  
+                  <SheetClose asChild>
+                    <Link to="/prijzen" className="py-2 text-lg font-medium hover:text-primary transition-colors">
+                      Prijzen
+                    </Link>
+                  </SheetClose>
+                  
+                  <SheetClose asChild>
+                    <Link to="/hoe-werkt-het" className="py-2 text-lg font-medium hover:text-primary transition-colors">
+                      Hoe werkt het?
+                    </Link>
+                  </SheetClose>
+                  
+                  <SheetClose asChild>
+                    <Link to="/faq" className="py-2 text-lg font-medium hover:text-primary transition-colors">
+                      FAQ
+                    </Link>
+                  </SheetClose>
+                  
+                  <SheetClose asChild>
+                    <Link to="/contact" className="py-2 text-lg font-medium hover:text-primary transition-colors">
+                      Contact
+                    </Link>
+                  </SheetClose>
+                  
+                  <div className="border-t border-border pt-4 mt-4 space-y-3">
+                    <SheetClose asChild>
+                      <Link to="/auth" className="block">
+                        <Button variant="outline" className="w-full">Inloggen</Button>
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link to="/auth?mode=signup" className="block">
+                        <Button className="w-full">30 dagen gratis proberen</Button>
+                      </Link>
+                    </SheetClose>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </nav>
