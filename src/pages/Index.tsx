@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,171 +11,25 @@ import {
   Clock, 
   Euro, 
   Leaf, 
-  Users, 
   Zap,
   ArrowRight,
   Star,
   ExternalLink,
   MonitorSmartphone,
   ShoppingBag,
-  Truck,
-  Menu,
-  X,
-  ChevronDown
+  Truck
 } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetClose,
-} from "@/components/ui/sheet";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import qrTableMockup from "@/assets/qr-table-mockup.png";
 import screenshotDashboard from "@/assets/screenshot-dashboard.png";
 import screenshotMenu from "@/assets/screenshot-menu.png";
 import screenshotQrcode from "@/assets/screenshot-qrcode.png";
 
 const Index = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <QrCode className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground font-serif">Digitale Menukaart</span>
-          </Link>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            <div className="relative group">
-              <button className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
-                Oplossingen
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div className="absolute top-full left-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                <Link to="/oplossingen/qr-menu" className="block px-4 py-3 text-sm hover:bg-muted transition-colors rounded-t-lg">
-                  QR Menu
-                </Link>
-                <Link to="/oplossingen/qr-menu-bestellen" className="block px-4 py-3 text-sm hover:bg-muted transition-colors rounded-b-lg">
-                  QR Menu + Bestellen
-                </Link>
-              </div>
-            </div>
-            <Link to="/prijzen" className="text-muted-foreground hover:text-foreground transition-colors">
-              Prijzen
-            </Link>
-            <Link to="/hoe-werkt-het" className="text-muted-foreground hover:text-foreground transition-colors">
-              Hoe werkt het?
-            </Link>
-            <Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors">
-              FAQ
-            </Link>
-            <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-              Contact
-            </Link>
-          </div>
-          
-          {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center gap-4">
-            <Link to="/auth">
-              <Button variant="ghost">Inloggen</Button>
-            </Link>
-            <Link to="/auth?mode=signup">
-              <Button>30 dagen gratis</Button>
-            </Link>
-          </div>
-
-          {/* Mobile Menu */}
-          <div className="md:hidden flex items-center gap-2">
-            <Link to="/auth?mode=signup">
-              <Button size="sm">Gratis proberen</Button>
-            </Link>
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] bg-card">
-                <div className="flex flex-col gap-4 mt-8">
-                  {/* Oplossingen Dropdown */}
-                  <Collapsible open={solutionsOpen} onOpenChange={setSolutionsOpen}>
-                    <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-lg font-medium hover:text-primary transition-colors">
-                      Oplossingen
-                      <ChevronDown className={`h-5 w-5 transition-transform ${solutionsOpen ? 'rotate-180' : ''}`} />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pl-4 space-y-2 mt-2">
-                      <SheetClose asChild>
-                        <Link 
-                          to="/oplossingen/qr-menu" 
-                          className="block py-2 text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          QR Menu
-                        </Link>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Link 
-                          to="/oplossingen/qr-menu-bestellen" 
-                          className="block py-2 text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          QR Menu + Bestellen
-                        </Link>
-                      </SheetClose>
-                    </CollapsibleContent>
-                  </Collapsible>
-                  
-                  <SheetClose asChild>
-                    <Link to="/prijzen" className="py-2 text-lg font-medium hover:text-primary transition-colors">
-                      Prijzen
-                    </Link>
-                  </SheetClose>
-                  
-                  <SheetClose asChild>
-                    <Link to="/hoe-werkt-het" className="py-2 text-lg font-medium hover:text-primary transition-colors">
-                      Hoe werkt het?
-                    </Link>
-                  </SheetClose>
-                  
-                  <SheetClose asChild>
-                    <Link to="/faq" className="py-2 text-lg font-medium hover:text-primary transition-colors">
-                      FAQ
-                    </Link>
-                  </SheetClose>
-                  
-                  <SheetClose asChild>
-                    <Link to="/contact" className="py-2 text-lg font-medium hover:text-primary transition-colors">
-                      Contact
-                    </Link>
-                  </SheetClose>
-                  
-                  <div className="border-t border-border pt-4 mt-4 space-y-3">
-                    <SheetClose asChild>
-                      <Link to="/auth" className="block">
-                        <Button variant="outline" className="w-full">Inloggen</Button>
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link to="/auth?mode=signup" className="block">
-                        <Button className="w-full">30 dagen gratis proberen</Button>
-                      </Link>
-                    </SheetClose>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16 md:py-24">
@@ -651,80 +504,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-12 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <QrCode className="h-6 w-6 text-primary" />
-                <span className="font-bold text-foreground font-serif">Digitale Menukaart</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                De eenvoudigste manier om uw menu digitaal aan te bieden aan uw gasten.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Oplossingen</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link to="/oplossingen/qr-menu" className="hover:text-foreground transition-colors">
-                    QR Menu
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/oplossingen/qr-menu-bestellen" className="hover:text-foreground transition-colors">
-                    QR Menu + Bestellen
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/prijzen" className="hover:text-foreground transition-colors">
-                    Prijzen
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Informatie</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link to="/hoe-werkt-het" className="hover:text-foreground transition-colors">
-                    Hoe werkt het?
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/faq" className="hover:text-foreground transition-colors">
-                    Veelgestelde vragen
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/contact" className="hover:text-foreground transition-colors">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Juridisch</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link to="/privacy" className="hover:text-foreground transition-colors">
-                    Privacybeleid
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/algemene-voorwaarden" className="hover:text-foreground transition-colors">
-                    Algemene voorwaarden
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border pt-8 text-center text-muted-foreground">
-            <p className="text-sm">© {new Date().getFullYear()} digitalemenukaart.nl - Alle rechten voorbehouden</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
