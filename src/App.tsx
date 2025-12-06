@@ -19,6 +19,14 @@ import OrderingSettings from "./pages/OrderingSettings";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancelled from "./pages/PaymentCancelled";
 import NotFound from "./pages/NotFound";
+import QRMenuPage from "./pages/QRMenuPage";
+import QRMenuOrderingPage from "./pages/QRMenuOrderingPage";
+import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
+import HowItWorks from "./pages/HowItWorks";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import PrijzenPage from "./pages/PrijzenPage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +42,14 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/prijzen" element={<PrijzenPage />} />
+          <Route path="/oplossingen/qr-menu" element={<QRMenuPage />} />
+          <Route path="/oplossingen/qr-menu-bestellen" element={<QRMenuOrderingPage />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/hoe-werkt-het" element={<HowItWorks />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/algemene-voorwaarden" element={<Terms />} />
           <Route path="/dashboard/restaurant/new" element={<RestaurantForm />} />
           <Route path="/dashboard/restaurant/:id" element={<RestaurantForm />} />
           <Route path="/dashboard/restaurant/:id/menus" element={<MenuList />} />

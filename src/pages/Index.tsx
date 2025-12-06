@@ -31,20 +31,39 @@ const Index = () => {
       {/* Navigation */}
       <nav className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <QrCode className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold text-foreground font-serif">Digitale Menukaart</span>
-          </div>
+          </Link>
           <div className="hidden md:flex items-center gap-6">
-            <a href="#hoe-werkt-het" className="text-muted-foreground hover:text-foreground transition-colors">
+            <div className="relative group">
+              <button className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                Oplossingen
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute top-full left-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <Link to="/oplossingen/qr-menu" className="block px-4 py-3 text-sm hover:bg-muted transition-colors rounded-t-lg">
+                  QR Menu
+                </Link>
+                <Link to="/oplossingen/qr-menu-bestellen" className="block px-4 py-3 text-sm hover:bg-muted transition-colors rounded-b-lg">
+                  QR Menu + Bestellen
+                </Link>
+              </div>
+            </div>
+            <Link to="/prijzen" className="text-muted-foreground hover:text-foreground transition-colors">
+              Prijzen
+            </Link>
+            <Link to="/hoe-werkt-het" className="text-muted-foreground hover:text-foreground transition-colors">
               Hoe werkt het?
-            </a>
-            <a href="#voordelen" className="text-muted-foreground hover:text-foreground transition-colors">
-              Voordelen
-            </a>
-            <a href="#demo" className="text-muted-foreground hover:text-foreground transition-colors">
-              Demo
-            </a>
+            </Link>
+            <Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors">
+              FAQ
+            </Link>
+            <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+              Contact
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/auth">
@@ -533,7 +552,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border py-12 bg-card">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <QrCode className="h-6 w-6 text-primary" />
@@ -544,36 +563,56 @@ const Index = () => {
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Links</h4>
+              <h4 className="font-semibold mb-4">Oplossingen</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <a href="#hoe-werkt-het" className="hover:text-foreground transition-colors">
-                    Hoe werkt het?
-                  </a>
+                  <Link to="/oplossingen/qr-menu" className="hover:text-foreground transition-colors">
+                    QR Menu
+                  </Link>
                 </li>
                 <li>
-                  <a href="#voordelen" className="hover:text-foreground transition-colors">
-                    Voordelen
-                  </a>
+                  <Link to="/oplossingen/qr-menu-bestellen" className="hover:text-foreground transition-colors">
+                    QR Menu + Bestellen
+                  </Link>
                 </li>
                 <li>
-                  <a href="#demo" className="hover:text-foreground transition-colors">
-                    Demo
-                  </a>
+                  <Link to="/prijzen" className="hover:text-foreground transition-colors">
+                    Prijzen
+                  </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Account</h4>
+              <h4 className="font-semibold mb-4">Informatie</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link to="/auth" className="hover:text-foreground transition-colors">
-                    Inloggen
+                  <Link to="/hoe-werkt-het" className="hover:text-foreground transition-colors">
+                    Hoe werkt het?
                   </Link>
                 </li>
                 <li>
-                  <Link to="/auth?mode=signup" className="hover:text-foreground transition-colors">
-                    Registreren
+                  <Link to="/faq" className="hover:text-foreground transition-colors">
+                    Veelgestelde vragen
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="hover:text-foreground transition-colors">
+                    Contact
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Juridisch</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link to="/privacy" className="hover:text-foreground transition-colors">
+                    Privacybeleid
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/algemene-voorwaarden" className="hover:text-foreground transition-colors">
+                    Algemene voorwaarden
                   </Link>
                 </li>
               </ul>
