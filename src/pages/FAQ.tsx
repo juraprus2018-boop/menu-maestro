@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const FAQ = () => {
   const faqs = [
@@ -64,8 +65,12 @@ const FAQ = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Veelgestelde vragen"
+        description="Antwoorden op veelgestelde vragen over onze digitale menukaart. Lees over prijzen, functies, proefperiode en meer."
+        canonicalUrl="/faq"
+      />
       <Navbar />
-
       {/* Header */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-transparent to-accent/20">
         <div className="container mx-auto px-4 text-center">

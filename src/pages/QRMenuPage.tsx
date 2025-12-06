@@ -15,10 +15,16 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const QRMenuPage = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="QR Menu - Digitale menukaart met QR-code"
+        description="Maak een digitale menukaart met QR-code voor uw restaurant. Gasten scannen en bekijken uw menu direct. Geen app nodig."
+        canonicalUrl="/oplossingen/qr-menu"
+      />
       <Navbar />
 
       {/* Hero Section */}

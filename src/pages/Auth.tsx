@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { QrCode, Loader2 } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -81,6 +82,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO 
+        title={isSignUp ? "Account aanmaken" : "Inloggen"}
+        description="Log in of maak een account aan om uw digitale menukaart te beheren. Start direct met 30 dagen gratis uitproberen."
+        canonicalUrl="/auth"
+      />
       <nav className="border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <Link to="/" className="flex items-center gap-2 w-fit">

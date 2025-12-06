@@ -5,10 +5,16 @@ import { Link } from "react-router-dom";
 import { Check, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const PrijzenPage = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Prijzen"
+        description="Bekijk de transparante prijzen van onze digitale menukaart. Vanaf €9/maand. Start met 30 dagen gratis uitproberen."
+        canonicalUrl="/prijzen"
+      />
       <Navbar />
 
       {/* Header */}

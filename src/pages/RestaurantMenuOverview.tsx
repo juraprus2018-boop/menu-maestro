@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Store, UtensilsCrossed, ChevronRight } from "lucide-react";
 import { getTheme, ThemeConfig } from "@/lib/menu-themes";
 import LanguageSelector from "@/components/LanguageSelector";
+import SEO from "@/components/SEO";
 
 interface Restaurant {
   id: string;

@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Check, Loader2, CreditCard, Globe, ShoppingBag } from "lucide-react";
 import { PLANS, SUBSCRIPTION_TIERS, getTierFromProductId, SubscriptionTier } from "@/lib/subscription-tiers";
+import SEO from "@/components/SEO";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -119,6 +120,11 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Abonnement kiezen"
+        description="Kies het abonnement dat bij uw restaurant past. Vanaf €9/maand voor een digitale menukaart. 30 dagen gratis uitproberen."
+        canonicalUrl="/pricing"
+      />
       <header className="bg-card border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>

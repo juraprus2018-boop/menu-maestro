@@ -1,11 +1,16 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO 
+        title="Privacybeleid"
+        description="Lees ons privacybeleid. Wij respecteren uw privacy en beschermen uw persoonsgegevens volgens de AVG."
+        canonicalUrl="/privacy"
+      />
       <Navbar />
-
       {/* Header */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-transparent to-accent/20">
         <div className="container mx-auto px-4 text-center">

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import qrTableMockup from "@/assets/qr-table-mockup.png";
 import screenshotDashboard from "@/assets/screenshot-dashboard.png";
 import screenshotMenu from "@/assets/screenshot-menu.png";
@@ -29,6 +30,11 @@ import screenshotQrcode from "@/assets/screenshot-qrcode.png";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Digitale Menukaart | Creëer uw QR-code menu"
+        description="Maak eenvoudig een digitale menukaart voor uw restaurant met QR-code. Gasten scannen en bekijken direct uw menu op hun telefoon. 30 dagen gratis."
+        canonicalUrl="/"
+      />
       <Navbar />
 
       {/* Hero Section */}

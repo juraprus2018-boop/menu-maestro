@@ -8,7 +8,7 @@ import { Plus, QrCode, LogOut, Settings, Store, Menu, CreditCard, AlertTriangle,
 import { useToast } from "@/hooks/use-toast";
 import { format, isPast, differenceInDays } from "date-fns";
 import { nl } from "date-fns/locale";
-
+import SEO from "@/components/SEO";
 interface Restaurant {
   id: string;
   name: string;
@@ -170,6 +170,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Dashboard"
+        description="Beheer uw restaurants en digitale menukaarten. Voeg menu's toe, bewerk gerechten en download QR-codes."
+        noIndex={true}
+      />
       {/* Header */}
       <header className="border-b border-border bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

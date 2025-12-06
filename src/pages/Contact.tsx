@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -61,6 +62,11 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO 
+        title="Contact"
+        description="Neem contact op met Digitale Menukaart. Wij helpen u graag met vragen over onze digitale menukaart en QR-code oplossingen."
+        canonicalUrl="/contact"
+      />
       <Navbar />
 
       {/* Header */}
