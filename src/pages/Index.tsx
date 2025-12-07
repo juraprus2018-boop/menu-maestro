@@ -61,7 +61,7 @@ const Index = () => {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/menu/le-troubadour-valkenswaard">
+              <Link to="/menu/demo">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg px-8">
                   <ExternalLink className="mr-2 h-5 w-5" />
                   Bekijk live demo
