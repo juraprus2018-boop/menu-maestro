@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          image_url: string | null
           menu_id: string | null
           name: string
           restaurant_id: string
@@ -28,6 +29,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           menu_id?: string | null
           name: string
           restaurant_id: string
@@ -37,6 +39,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           menu_id?: string | null
           name?: string
           restaurant_id?: string
@@ -111,6 +114,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          image_url: string | null
           is_active: boolean
           name: string
           restaurant_id: string
@@ -121,6 +125,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean
           name: string
           restaurant_id: string
@@ -131,6 +136,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean
           name?: string
           restaurant_id?: string
