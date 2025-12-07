@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Edit2, Trash2, QrCode, GripVertical, Eye, Globe } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, Trash2, QrCode, GripVertical, Eye, Globe, Upload, X } from "lucide-react";
 import { AllergenSelector, getAllergenInfo } from "@/components/AllergenSelector";
 import TranslationManager from "@/components/TranslationManager";
 
@@ -17,6 +17,7 @@ interface Category {
   name: string;
   description: string | null;
   sort_order: number;
+  image_url: string | null;
 }
 
 interface MenuItem {
@@ -58,6 +59,8 @@ const MenuManager = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryName, setCategoryName] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
+  const [categoryImageUrl, setCategoryImageUrl] = useState("");
+  const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
 
   // Item form
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
@@ -165,12 +168,41 @@ const MenuManager = () => {
       setEditingCategory(category);
       setCategoryName(category.name);
       setCategoryDescription(category.description || "");
+      setCategoryImageUrl(category.image_url || "");
     } else {
       setEditingCategory(null);
       setCategoryName("");
       setCategoryDescription("");
+      setCategoryImageUrl("");
     }
     setCategoryDialogOpen(true);
+  };
+
+  const handleCategoryImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingCategoryImage(true);
+    const fileExt = file.name.split(".").pop();
+    const fileName = `category-${Date.now()}.${fileExt}`;
+    const filePath = `${restaurantId}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("restaurant-assets")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      toast({ title: "Fout bij uploaden", description: uploadError.message, variant: "destructive" });
+      setUploadingCategoryImage(false);
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("restaurant-assets")
+      .getPublicUrl(filePath);
+
+    setCategoryImageUrl(publicUrl);
+    setUploadingCategoryImage(false);
   };
 
   const saveCategory = async () => {
@@ -179,6 +211,7 @@ const MenuManager = () => {
     const categoryData = {
       name: categoryName,
       description: categoryDescription || null,
+      image_url: categoryImageUrl || null,
       menu_id: menuId,
       restaurant_id: restaurantId,
       sort_order: editingCategory ? editingCategory.sort_order : categories.length,
@@ -517,6 +550,38 @@ const MenuManager = () => {
                   placeholder="Optionele beschrijving..."
                   rows={2}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>Afbeelding (optioneel)</Label>
+                {categoryImageUrl ? (
+                  <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                    <img src={categoryImageUrl} alt="Categorie" className="w-full h-full object-cover" />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 h-8 w-8"
+                      onClick={() => setCategoryImageUrl("")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-border rounded-lg p-4">
+                    <label className="cursor-pointer flex flex-col items-center gap-2">
+                      <Upload className="h-6 w-6 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {uploadingCategoryImage ? "Uploaden..." : "Klik om afbeelding te uploaden"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleCategoryImageUpload}
+                        disabled={uploadingCategoryImage}
+                      />
+                    </label>
+                  </div>
+                )}
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setCategoryDialogOpen(false)}>

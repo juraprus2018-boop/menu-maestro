@@ -39,6 +39,7 @@ interface Category {
   name: string;
   description: string | null;
   sort_order: number;
+  image_url: string | null;
 }
 
 interface MenuItem {
@@ -437,6 +438,13 @@ const PublicMenu = () => {
                       <p className={`text-muted-foreground text-sm mt-2 ${theme.bodyFont}`}>
                         {getTranslation("category", category.id, "description", category.description)}
                       </p>
+                    )}
+                    {category.image_url && (
+                      <img
+                        src={category.image_url}
+                        alt={category.name}
+                        className="w-full max-h-48 object-cover rounded-lg mt-4"
+                      />
                     )}
                   </div>
                   <div>
