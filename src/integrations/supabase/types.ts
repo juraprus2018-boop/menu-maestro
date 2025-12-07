@@ -365,10 +365,12 @@ export type Database = {
         Row: {
           created_at: string
           enabled_languages: string[]
+          global_image_url: string | null
           id: string
           intro_text: string | null
           logo_url: string | null
           name: string
+          show_logo: boolean
           slug: string
           theme: string
           updated_at: string
@@ -377,10 +379,12 @@ export type Database = {
         Insert: {
           created_at?: string
           enabled_languages?: string[]
+          global_image_url?: string | null
           id?: string
           intro_text?: string | null
           logo_url?: string | null
           name: string
+          show_logo?: boolean
           slug: string
           theme?: string
           updated_at?: string
@@ -389,10 +393,12 @@ export type Database = {
         Update: {
           created_at?: string
           enabled_languages?: string[]
+          global_image_url?: string | null
           id?: string
           intro_text?: string | null
           logo_url?: string | null
           name?: string
+          show_logo?: boolean
           slug?: string
           theme?: string
           updated_at?: string

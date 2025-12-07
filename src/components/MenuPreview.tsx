@@ -4,10 +4,12 @@ interface MenuPreviewProps {
   theme: string | null | undefined;
   restaurantName: string;
   logoUrl: string | null;
+  showLogo?: boolean;
   introText: string;
+  globalImageUrl?: string | null;
 }
 
-const MenuPreview = ({ theme, restaurantName, logoUrl, introText }: MenuPreviewProps) => {
+const MenuPreview = ({ theme, restaurantName, logoUrl, showLogo = true, introText, globalImageUrl }: MenuPreviewProps) => {
   const themeConfig = getTheme(theme);
 
   // Sample preview data
@@ -36,7 +38,7 @@ const MenuPreview = ({ theme, restaurantName, logoUrl, introText }: MenuPreviewP
       <div className={`${themeConfig.bodyBg} min-h-[400px]`}>
         {/* Header */}
         <div className={`${themeConfig.headerBg} ${themeConfig.headerText} p-4 text-center`}>
-          {logoUrl && (
+          {showLogo && logoUrl && (
             <img
               src={logoUrl}
               alt="Logo"
@@ -86,6 +88,17 @@ const MenuPreview = ({ theme, restaurantName, logoUrl, introText }: MenuPreviewP
               </div>
             </div>
           ))}
+
+          {/* Global Image */}
+          {globalImageUrl && (
+            <div className="mt-6 pt-4 border-t border-border/30">
+              <img
+                src={globalImageUrl}
+                alt="Menu afbeelding"
+                className="w-full h-24 object-cover rounded-lg"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

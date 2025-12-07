@@ -20,10 +20,12 @@ interface Restaurant {
   id: string;
   name: string;
   logo_url: string | null;
+  show_logo: boolean;
   intro_text: string | null;
   slug: string;
   theme: string | null;
   enabled_languages: string[];
+  global_image_url: string | null;
 }
 
 interface MenuType {
@@ -301,17 +303,17 @@ const PublicMenu = () => {
             )}
           </div>
           <div className="text-center">
-            {restaurant?.logo_url ? (
+            {restaurant?.show_logo && restaurant?.logo_url ? (
               <img
                 src={restaurant.logo_url}
                 alt={restaurant.name}
                 className="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white/20"
               />
-            ) : (
+            ) : restaurant?.show_logo ? (
               <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-white/20 flex items-center justify-center">
                 <UtensilsCrossed className="h-12 w-12" />
               </div>
-            )}
+            ) : null}
             <h1 className={`text-3xl md:text-4xl font-bold ${theme.titleFont}`}>
               {getTranslation("restaurant", restaurant?.id || "", "name", restaurant?.name || "")}
             </h1>
@@ -487,6 +489,17 @@ const PublicMenu = () => {
                 </section>
               );
             })}
+          </div>
+        )}
+
+        {/* Global Image */}
+        {restaurant?.global_image_url && (
+          <div className="mt-8">
+            <img
+              src={restaurant.global_image_url}
+              alt="Restaurant afbeelding"
+              className="w-full max-h-64 object-cover rounded-lg"
+            />
           </div>
         )}
 

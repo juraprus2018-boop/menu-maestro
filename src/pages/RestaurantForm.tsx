@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette, Globe, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette, Globe, ShoppingBag, ImageIcon } from "lucide-react";
 import { themes, MenuTheme } from "@/lib/menu-themes";
 import MenuPreview from "@/components/MenuPreview";
 import LanguageSettings from "@/components/LanguageSettings";
@@ -22,10 +23,13 @@ const RestaurantForm = () => {
   const [slug, setSlug] = useState("");
   const [introText, setIntroText] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [showLogo, setShowLogo] = useState(true);
+  const [globalImageUrl, setGlobalImageUrl] = useState<string | null>(null);
   const [theme, setTheme] = useState<MenuTheme>("default");
   const [enabledLanguages, setEnabledLanguages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingGlobalImage, setUploadingGlobalImage] = useState(false);
   const [translationDialogOpen, setTranslationDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -57,6 +61,8 @@ const RestaurantForm = () => {
       setSlug(data.slug);
       setIntroText(data.intro_text || "");
       setLogoUrl(data.logo_url);
+      setShowLogo(data.show_logo ?? true);
+      setGlobalImageUrl(data.global_image_url || null);
       setTheme((data.theme as MenuTheme) || "default");
       setEnabledLanguages(data.enabled_languages || []);
     }
@@ -105,6 +111,34 @@ const RestaurantForm = () => {
     setUploading(false);
   };
 
+  const handleGlobalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingGlobalImage(true);
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `global-images/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("restaurant-assets")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      toast({
+        title: "Upload mislukt",
+        description: uploadError.message,
+        variant: "destructive",
+      });
+    } else {
+      const { data } = supabase.storage
+        .from("restaurant-assets")
+        .getPublicUrl(filePath);
+      setGlobalImageUrl(data.publicUrl);
+    }
+    setUploadingGlobalImage(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -120,6 +154,8 @@ const RestaurantForm = () => {
       slug,
       intro_text: introText || null,
       logo_url: logoUrl,
+      show_logo: showLogo,
+      global_image_url: globalImageUrl,
       theme,
       user_id: user.id,
     };
@@ -258,7 +294,7 @@ const RestaurantForm = () => {
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     <Label>Logo</Label>
                     <div className="flex items-center gap-4">
                       {logoUrl ? (
@@ -283,6 +319,59 @@ const RestaurantForm = () => {
                         <p className="text-xs text-muted-foreground mt-1">
                           Aanbevolen: vierkant, minimaal 200x200px
                         </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2 pt-2">
+                      <Switch
+                        id="show-logo"
+                        checked={showLogo}
+                        onCheckedChange={setShowLogo}
+                      />
+                      <Label htmlFor="show-logo" className="cursor-pointer">
+                        Logo tonen op menukaart
+                      </Label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="h-5 w-5 text-primary" />
+                      <Label>Menu afbeelding (onderaan)</Label>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      {globalImageUrl ? (
+                        <img
+                          src={globalImageUrl}
+                          alt="Menu afbeelding"
+                          className="w-32 h-20 rounded-lg object-cover border border-border"
+                        />
+                      ) : (
+                        <div className="w-32 h-20 rounded-lg bg-muted flex items-center justify-center border border-border">
+                          <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleGlobalImageUpload}
+                          className="max-w-xs"
+                          disabled={uploadingGlobalImage}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Wordt onderaan de menukaart getoond
+                        </p>
+                        {globalImageUrl && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="mt-1 text-destructive"
+                            onClick={() => setGlobalImageUrl(null)}
+                          >
+                            Verwijderen
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -318,7 +407,7 @@ const RestaurantForm = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-4 pt-4">
-                    <Button type="submit" disabled={loading || uploading}>
+                    <Button type="submit" disabled={loading || uploading || uploadingGlobalImage}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       {isEditing ? "Opslaan" : "Restaurant aanmaken"}
                     </Button>
@@ -359,7 +448,9 @@ const RestaurantForm = () => {
               theme={theme}
               restaurantName={name}
               logoUrl={logoUrl}
+              showLogo={showLogo}
               introText={introText}
+              globalImageUrl={globalImageUrl}
             />
           </div>
         </div>
