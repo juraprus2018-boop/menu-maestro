@@ -60,6 +60,7 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
+      payment_method_types: ["card", "ideal"],
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url: `${origin}/pricing?checkout=canceled`,
       metadata: {
