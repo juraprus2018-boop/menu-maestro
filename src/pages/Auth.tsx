@@ -14,6 +14,11 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(searchParams.get("mode") === "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [businessInfo, setBusinessInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -45,6 +50,13 @@ const Auth = () => {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: {
+              company_name: companyName,
+              first_name: firstName,
+              last_name: lastName,
+              phone: phone,
+              business_info: businessInfo,
+            },
           },
         });
         if (error) throw error;
@@ -110,6 +122,67 @@ const Auth = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {isSignUp && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="companyName">Bedrijfsnaam *</Label>
+                    <Input
+                      id="companyName"
+                      type="text"
+                      placeholder="Naam van uw bedrijf"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">Voornaam *</Label>
+                      <Input
+                        id="firstName"
+                        type="text"
+                        placeholder="Voornaam"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Achternaam *</Label>
+                      <Input
+                        id="lastName"
+                        type="text"
+                        placeholder="Achternaam"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Telefoonnummer *</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+31 6 12345678"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="businessInfo">Wat voor bedrijf heeft u en in welk(e) product(en) bent u geïnteresseerd? *</Label>
+                    <textarea
+                      id="businessInfo"
+                      className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="Beschrijf uw bedrijf en welke producten u interesseren..."
+                      value={businessInfo}
+                      onChange={(e) => setBusinessInfo(e.target.value)}
+                      required
+                    />
+                  </div>
+                </>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">E-mailadres</Label>
                 <Input
