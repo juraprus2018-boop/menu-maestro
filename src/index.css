@@ -155,4 +155,11 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  h1 {
+    font-weight:800;
+  }
+    h2 {
+    font-weight:700;
+  }
 }
