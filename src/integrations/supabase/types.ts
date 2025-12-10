@@ -280,25 +280,40 @@ export type Database = {
       }
       profiles: {
         Row: {
+          business_info: string | null
+          company_name: string | null
           created_at: string
           email: string
+          first_name: string | null
           id: string
+          last_name: string | null
+          phone: string | null
           trial_ends_at: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          business_info?: string | null
+          company_name?: string | null
           created_at?: string
           email: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
+          phone?: string | null
           trial_ends_at?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          business_info?: string | null
+          company_name?: string | null
           created_at?: string
           email?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
+          phone?: string | null
           trial_ends_at?: string
           updated_at?: string
           user_id?: string
