@@ -12,10 +12,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Mail, Users, CreditCard, Clock } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, Users, CreditCard, Clock, Shield } from "lucide-react";
 import { format, isPast } from "date-fns";
 import { nl } from "date-fns/locale";
+import { SUBSCRIPTION_TIERS, PLANS } from "@/lib/subscription-tiers";
 
 interface UserProfile {
   id: string;
@@ -44,6 +46,13 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [adminSubscriptions, setAdminSubscriptions] = useState<{basic: boolean, pro: boolean, ordering: boolean}>({
+    basic: false,
+    pro: false,
+    ordering: false,
+  });
+  const [savingAdminSub, setSavingAdminSub] = useState(false);
 
   useEffect(() => {
     checkAdminAndFetchUsers();
@@ -57,6 +66,8 @@ const AdminDashboard = () => {
         navigate("/auth");
         return;
       }
+
+      setCurrentUserId(session.user.id);
 
       // Check admin role
       const { data: roleData, error: roleError } = await supabase
@@ -78,9 +89,93 @@ const AdminDashboard = () => {
 
       setIsAdmin(true);
       await fetchUsers();
+      await fetchAdminSubscriptions(session.user.id);
     } catch (error) {
       console.error("Error checking admin:", error);
       navigate("/dashboard");
+    }
+  };
+
+  const fetchAdminSubscriptions = async (userId: string) => {
+    try {
+      const { data: subs, error } = await supabase
+        .from("subscriptions")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("status", "active");
+
+      if (error) throw error;
+
+      const activeProductIds = subs?.map(s => s.plan) || [];
+      
+      setAdminSubscriptions({
+        basic: activeProductIds.some(id => SUBSCRIPTION_TIERS.basic.productIds.includes(id as any)),
+        pro: activeProductIds.some(id => SUBSCRIPTION_TIERS.pro.productIds.includes(id as any)),
+        ordering: activeProductIds.some(id => SUBSCRIPTION_TIERS.ordering.productIds.includes(id as any)),
+      });
+    } catch (error) {
+      console.error("Error fetching admin subscriptions:", error);
+    }
+  };
+
+  const toggleAdminSubscription = async (tier: "basic" | "pro" | "ordering") => {
+    if (!currentUserId) return;
+    setSavingAdminSub(true);
+
+    try {
+      const productId = tier === "basic" 
+        ? PLANS.basic_monthly.productId 
+        : tier === "pro" 
+          ? PLANS.pro_monthly.productId 
+          : PLANS.ordering_monthly.productId;
+
+      if (adminSubscriptions[tier]) {
+        // Remove subscription
+        const { error } = await supabase
+          .from("subscriptions")
+          .delete()
+          .eq("user_id", currentUserId)
+          .eq("plan", productId);
+
+        if (error) throw error;
+
+        setAdminSubscriptions(prev => ({ ...prev, [tier]: false }));
+        toast({
+          title: "Abonnement verwijderd",
+          description: `${SUBSCRIPTION_TIERS[tier].name} abonnement is uitgeschakeld.`,
+        });
+      } else {
+        // Add subscription
+        const { error } = await supabase
+          .from("subscriptions")
+          .insert({
+            user_id: currentUserId,
+            plan: productId,
+            status: "active",
+            started_at: new Date().toISOString(),
+            expires_at: null, // Admin subs don't expire
+          });
+
+        if (error) throw error;
+
+        setAdminSubscriptions(prev => ({ ...prev, [tier]: true }));
+        toast({
+          title: "Abonnement geactiveerd",
+          description: `${SUBSCRIPTION_TIERS[tier].name} abonnement is nu actief.`,
+        });
+      }
+
+      // Refresh users list to update stats
+      await fetchUsers();
+    } catch (error: any) {
+      console.error("Error toggling subscription:", error);
+      toast({
+        title: "Fout",
+        description: "Kon abonnement niet wijzigen: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSavingAdminSub(false);
     }
   };
 
@@ -189,6 +284,57 @@ const AdminDashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Admin Subscription Control */}
+        <Card className="mb-8 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Mijn Admin Abonnementen
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Als admin kun je abonnementen activeren zonder te betalen.
+            </p>
+            <div className="flex flex-wrap gap-6">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="admin-basic" 
+                  checked={adminSubscriptions.basic}
+                  onCheckedChange={() => toggleAdminSubscription("basic")}
+                  disabled={savingAdminSub}
+                />
+                <label htmlFor="admin-basic" className="text-sm font-medium cursor-pointer">
+                  Basis (€9/maand)
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="admin-pro" 
+                  checked={adminSubscriptions.pro}
+                  onCheckedChange={() => toggleAdminSubscription("pro")}
+                  disabled={savingAdminSub}
+                />
+                <label htmlFor="admin-pro" className="text-sm font-medium cursor-pointer">
+                  Pro (€14,95/maand)
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="admin-ordering" 
+                  checked={adminSubscriptions.ordering}
+                  onCheckedChange={() => toggleAdminSubscription("ordering")}
+                  disabled={savingAdminSub}
+                />
+                <label htmlFor="admin-ordering" className="text-sm font-medium cursor-pointer">
+                  Bestellen (€29,50/maand)
+                </label>
+              </div>
+              {savingAdminSub && <Loader2 className="h-4 w-4 animate-spin" />}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
