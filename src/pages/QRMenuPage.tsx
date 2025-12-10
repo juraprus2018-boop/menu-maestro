@@ -16,6 +16,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import { BreadcrumbSchema, WebPageSchema } from "@/components/StructuredData";
 
 const QRMenuPage = () => {
   return (
@@ -24,6 +25,16 @@ const QRMenuPage = () => {
         title="QR Menu - Digitale menukaart met QR-code"
         description="Maak een digitale menukaart met QR-code voor uw restaurant. Gasten scannen en bekijken uw menu direct. Geen app nodig."
         canonicalUrl="/oplossingen/qr-menu"
+      />
+      <BreadcrumbSchema items={[
+        { name: "Home", url: "/" },
+        { name: "Oplossingen", url: "/oplossingen" },
+        { name: "QR Menu", url: "/oplossingen/qr-menu" }
+      ]} />
+      <WebPageSchema 
+        title="QR Menu - Digitale menukaart met QR-code"
+        description="Maak een digitale menukaart met QR-code voor uw restaurant"
+        url="/oplossingen/qr-menu"
       />
       <Navbar />
 

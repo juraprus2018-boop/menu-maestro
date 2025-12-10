@@ -22,6 +22,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import { OrganizationSchema, SoftwareApplicationSchema } from "@/components/StructuredData";
 import qrTableMockup from "@/assets/qr-table-mockup.png";
 import screenshotDashboard from "@/assets/screenshot-dashboard.png";
 import screenshotMenu from "@/assets/screenshot-menu.png";
@@ -35,6 +36,8 @@ const Index = () => {
         description="Maak eenvoudig een digitale menukaart voor uw restaurant met QR-code. Gasten scannen en bekijken direct uw menu op hun telefoon. 30 dagen gratis."
         canonicalUrl="/"
       />
+      <OrganizationSchema />
+      <SoftwareApplicationSchema />
       <Navbar />
 
       {/* Hero Section */}
@@ -213,8 +216,9 @@ const Index = () => {
               <div>
                 <img 
                   src={screenshotDashboard} 
-                  alt="Dashboard overzicht" 
+                  alt="Dashboard overzicht voor digitale menukaart beheer - restaurants beheren met logo en welkomsttekst" 
                   className="rounded-xl shadow-lg border border-border w-full"
+                  loading="lazy"
                 />
               </div>
             </div>
@@ -226,8 +230,9 @@ const Index = () => {
               <div className="order-2 lg:order-1">
                 <img 
                   src={screenshotMenu} 
-                  alt="Menu beheer" 
+                  alt="Menu beheer interface - categorieën en gerechten toevoegen aan digitale menukaart" 
                   className="rounded-xl shadow-lg border border-border w-full"
+                  loading="lazy"
                 />
               </div>
               <div className="order-1 lg:order-2">
@@ -281,8 +286,9 @@ const Index = () => {
               <div>
                 <img 
                   src={screenshotQrcode} 
-                  alt="QR code generator" 
+                  alt="QR code generator voor restaurant menukaart - download en print uw unieke QR-code" 
                   className="rounded-xl shadow-lg border border-border w-full"
+                  loading="lazy"
                 />
               </div>
             </div>
@@ -389,8 +395,9 @@ const Index = () => {
             <div>
               <img 
                 src={qrTableMockup} 
-                alt="QR code op restauranttafel" 
+                alt="QR code standaard op restauranttafel - gasten scannen voor digitale menukaart" 
                 className="rounded-2xl shadow-xl"
+                loading="lazy"
               />
             </div>
           </div>

@@ -1,8 +1,12 @@
+# Robots.txt for digitalemenukaart.nl
+
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +16,13 @@ Allow: /
 
 User-agent: *
 Allow: /
+Crawl-delay: 2
+
+# Sitemap location
+Sitemap: https://digitalemenukaart.nl/sitemap.xml
+
+# Disallow admin and dashboard routes (private areas)
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /payment-success
+Disallow: /payment-cancelled
