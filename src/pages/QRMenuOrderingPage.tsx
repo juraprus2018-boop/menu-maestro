@@ -15,6 +15,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import { BreadcrumbSchema, WebPageSchema } from "@/components/StructuredData";
 
 const QRMenuOrderingPage = () => {
   return (
@@ -23,6 +24,16 @@ const QRMenuOrderingPage = () => {
         title="QR Menu + Online Bestellen"
         description="Combineer uw digitale menukaart met online bestellen. Ontvang bestellingen voor afhalen en bezorgen direct in uw dashboard."
         canonicalUrl="/oplossingen/qr-menu-bestellen"
+      />
+      <BreadcrumbSchema items={[
+        { name: "Home", url: "/" },
+        { name: "Oplossingen", url: "/oplossingen" },
+        { name: "QR Menu + Bestellen", url: "/oplossingen/qr-menu-bestellen" }
+      ]} />
+      <WebPageSchema 
+        title="QR Menu + Online Bestellen"
+        description="Combineer uw digitale menukaart met online bestellen voor afhalen en bezorgen"
+        url="/oplossingen/qr-menu-bestellen"
       />
       <Navbar />
 

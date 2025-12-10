@@ -10,6 +10,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import { FAQSchema } from "@/components/StructuredData";
 
 const FAQ = () => {
   const faqs = [
@@ -70,6 +71,7 @@ const FAQ = () => {
         description="Antwoorden op veelgestelde vragen over onze digitale menukaart. Lees over prijzen, functies, proefperiode en meer."
         canonicalUrl="/faq"
       />
+      <FAQSchema faqs={faqs} />
       <Navbar />
       {/* Header */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-transparent to-accent/20">
