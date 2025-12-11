@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Lock } from "lucide-react";
 import { OpeningHoursEditor, OpeningHours, defaultOpeningHours } from "@/components/OpeningHoursEditor";
 import { Json } from "@/integrations/supabase/types";
+import { hasOrderingSubscription } from "@/lib/subscription-tiers";
 
 interface OrderingSettings {
   id?: string;
@@ -33,6 +34,8 @@ const OrderingSettings = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [hasOrdering, setHasOrdering] = useState(false);
+  const [checkingSubscription, setCheckingSubscription] = useState(true);
   const [settings, setSettings] = useState<OrderingSettings>({
     restaurant_id: restaurantId || "",
     is_ordering_enabled: false,
@@ -49,10 +52,30 @@ const OrderingSettings = () => {
   });
 
   useEffect(() => {
-    if (restaurantId) {
+    checkSubscription();
+  }, []);
+
+  useEffect(() => {
+    if (restaurantId && hasOrdering) {
       fetchSettings();
     }
-  }, [restaurantId]);
+  }, [restaurantId, hasOrdering]);
+
+  const checkSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("check-subscription");
+      if (error) throw error;
+      
+      const productIds = data?.product_ids || [];
+      setHasOrdering(hasOrderingSubscription(productIds));
+    } catch (error) {
+      console.error("Error checking subscription:", error);
+      setHasOrdering(false);
+    } finally {
+      setCheckingSubscription(false);
+      setLoading(false);
+    }
+  };
 
   const fetchSettings = async () => {
     try {
@@ -113,10 +136,41 @@ const OrderingSettings = () => {
     }
   };
 
-  if (loading) {
+  if (loading || checkingSubscription) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!hasOrdering) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="bg-card border-b border-border">
+          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(`/dashboard/restaurant/${restaurantId}`)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold font-serif text-primary">Bestelinstellingen</h1>
+          </div>
+        </header>
+        <main className="container mx-auto px-4 py-12 max-w-lg">
+          <Card>
+            <CardHeader className="text-center">
+              <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <CardTitle>Bestellen abonnement vereist</CardTitle>
+              <CardDescription>
+                Om online bestellingen te ontvangen heeft u het Bestellen abonnement nodig (€29,50/maand).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button onClick={() => navigate("/prijzen")}>
+                Bekijk abonnementen
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }

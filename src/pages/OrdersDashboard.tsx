@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Clock, Phone, MapPin, User, RefreshCw, Settings } from "lucide-react";
+import { ArrowLeft, Clock, Phone, MapPin, User, RefreshCw, Settings, Lock, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
+import { hasOrderingSubscription } from "@/lib/subscription-tiers";
 
 interface Order {
   id: string;
@@ -66,12 +67,35 @@ const OrdersDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("active");
+  const [hasOrdering, setHasOrdering] = useState(false);
+  const [checkingSubscription, setCheckingSubscription] = useState(true);
 
   useEffect(() => {
-    if (restaurantId) {
-      fetchOrders();
+    checkSubscription();
+  }, []);
+
+  const checkSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("check-subscription");
+      if (error) throw error;
+      
+      const productIds = data?.product_ids || [];
+      setHasOrdering(hasOrderingSubscription(productIds));
+    } catch (error) {
+      console.error("Error checking subscription:", error);
+      setHasOrdering(false);
+    } finally {
+      setCheckingSubscription(false);
     }
-  }, [restaurantId, statusFilter]);
+  };
+
+  useEffect(() => {
+    if (restaurantId && hasOrdering) {
+      fetchOrders();
+    } else if (!checkingSubscription && !hasOrdering) {
+      setLoading(false);
+    }
+  }, [restaurantId, statusFilter, hasOrdering, checkingSubscription]);
 
   // Realtime subscription for new orders
   useEffect(() => {
@@ -192,6 +216,45 @@ const OrdersDashboard = () => {
     return flow[currentStatus] || null;
   };
 
+  if (checkingSubscription) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!hasOrdering) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="bg-card border-b border-border">
+          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(`/dashboard/restaurant/${restaurantId}`)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold font-serif text-primary">Bestellingen</h1>
+          </div>
+        </header>
+        <main className="container mx-auto px-4 py-12 max-w-lg">
+          <Card>
+            <CardHeader className="text-center">
+              <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <CardTitle>Bestellen abonnement vereist</CardTitle>
+              <CardDescription>
+                Om online bestellingen te ontvangen heeft u het Bestellen abonnement nodig (€29,50/maand).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button onClick={() => navigate("/prijzen")}>
+                Bekijk abonnementen
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-card border-b border-border sticky top-0 z-10">
@@ -231,7 +294,7 @@ const OrdersDashboard = () => {
 
       <main className="container mx-auto px-4 py-6">
         {loading ? (
-          <div className="text-center py-12">Laden...</div>
+          <div className="text-center py-12"><Loader2 className="h-8 w-8 animate-spin mx-auto" /></div>
         ) : orders.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Geen bestellingen gevonden</p>
