@@ -23,7 +23,85 @@ serve(async (req) => {
   try {
     const { orderId, customerEmail, customerName, totalAmount, restaurantName }: OrderPaymentRequest = await req.json();
     
+    // Validate required fields
+    if (!orderId || !customerName || !totalAmount || !restaurantName) {
+      console.error("Missing required parameters");
+      return new Response(JSON.stringify({ error: "Missing required parameters" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Validate orderId format (UUID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(orderId)) {
+      console.error("Invalid orderId format:", orderId);
+      return new Response(JSON.stringify({ error: "Invalid order ID format" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Validate totalAmount is a positive number
+    if (typeof totalAmount !== 'number' || totalAmount <= 0 || totalAmount > 10000) {
+      console.error("Invalid totalAmount:", totalAmount);
+      return new Response(JSON.stringify({ error: "Invalid total amount" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     console.log("Creating payment session for order:", orderId, "Amount:", totalAmount);
+
+    // Verify order exists and is in pending payment status
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select("id, payment_status, total, created_at")
+      .eq("id", orderId)
+      .single();
+
+    if (orderError || !order) {
+      console.error("Order not found:", orderId, orderError);
+      return new Response(JSON.stringify({ error: "Order not found" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+
+    // Check if order is already paid
+    if (order.payment_status === "paid") {
+      console.error("Order already paid:", orderId);
+      return new Response(JSON.stringify({ error: "Order already paid" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Verify the total amount matches
+    if (Math.abs(order.total - totalAmount) > 0.01) {
+      console.error("Amount mismatch. Order total:", order.total, "Requested:", totalAmount);
+      return new Response(JSON.stringify({ error: "Amount mismatch" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Verify order was created recently (within last 24 hours)
+    const orderCreatedAt = new Date(order.created_at);
+    const now = new Date();
+    const hoursSinceCreation = (now.getTime() - orderCreatedAt.getTime()) / (1000 * 60 * 60);
+    if (hoursSinceCreation > 24) {
+      console.error("Order too old:", orderId, "Created:", order.created_at);
+      return new Response(JSON.stringify({ error: "Order expired" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -48,15 +126,15 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success?order_id=${orderId}`,
+      success_url: `${req.headers.get("origin")}/payment-success?order_id=${orderId}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/payment-cancelled?order_id=${orderId}`,
       metadata: {
         order_id: orderId,
       },
     };
 
-    // Add customer email if provided
-    if (customerEmail) {
+    // Add customer email if provided and valid
+    if (customerEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
       sessionParams.customer_email = customerEmail;
     }
 
