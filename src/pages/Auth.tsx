@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { QrCode, Loader2 } from "lucide-react";
+import { QrCode, Loader2, Mail, CheckCircle } from "lucide-react";
 import SEO from "@/components/SEO";
 
 const Auth = () => {
@@ -20,6 +20,7 @@ const Auth = () => {
   const [phone, setPhone] = useState("");
   const [businessInfo, setBusinessInfo] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -73,10 +74,8 @@ const Auth = () => {
           },
         }).catch(err => console.error("Failed to send notification:", err));
         
-        toast({
-          title: "Account aangemaakt!",
-          description: "U bent nu ingelogd.",
-        });
+        // Show email verification message
+        setEmailSent(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -94,6 +93,8 @@ const Auth = () => {
         message = "Dit e-mailadres is al geregistreerd. Probeer in te loggen.";
       } else if (error.message === "Invalid login credentials") {
         message = "Ongeldige inloggegevens. Controleer uw e-mail en wachtwoord.";
+      } else if (error.message === "Email not confirmed") {
+        message = "Uw e-mailadres is nog niet geverifieerd. Controleer uw inbox.";
       }
       toast({
         title: "Fout",
@@ -104,6 +105,79 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  // Email verification success screen
+  if (emailSent) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <SEO 
+          title="Bevestig uw e-mailadres"
+          description="Controleer uw inbox om uw e-mailadres te bevestigen."
+          canonicalUrl="/auth"
+        />
+        <nav className="border-b border-border bg-card/80 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-4">
+            <Link to="/" className="flex items-center gap-2 w-fit">
+              <QrCode className="h-8 w-8 text-primary" />
+              <span className="text-xl font-bold text-foreground font-serif">Digitale Menukaart</span>
+            </Link>
+          </div>
+        </nav>
+
+        <div className="flex-1 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Mail className="h-8 w-8 text-primary" />
+              </div>
+              <CardTitle className="text-2xl font-serif">
+                Controleer uw inbox
+              </CardTitle>
+              <CardDescription className="text-base mt-2">
+                We hebben een verificatie-e-mail gestuurd naar:
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-6">
+              <p className="font-medium text-lg bg-muted px-4 py-2 rounded-md">
+                {email}
+              </p>
+              
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <div className="flex items-start gap-3 text-left">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <p>Klik op de link in de e-mail om uw account te activeren</p>
+                </div>
+                <div className="flex items-start gap-3 text-left">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <p>Na verificatie kunt u direct inloggen</p>
+                </div>
+                <div className="flex items-start gap-3 text-left">
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <p>Controleer ook uw spam/ongewenste map</p>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t">
+                <p className="text-sm text-muted-foreground mb-3">
+                  Geen e-mail ontvangen?
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setEmailSent(false);
+                    setIsSignUp(false);
+                  }}
+                  className="w-full"
+                >
+                  Terug naar inloggen
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
