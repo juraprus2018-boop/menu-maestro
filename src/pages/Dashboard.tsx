@@ -141,6 +141,9 @@ const Dashboard = () => {
   };
 
   const getTrialInfo = () => {
+    // Admins krijgen geen trial/abonnement info te zien
+    if (isAdmin) return null;
+    
     if (!profile) return null;
     
     const trialEndDate = new Date(profile.trial_ends_at);

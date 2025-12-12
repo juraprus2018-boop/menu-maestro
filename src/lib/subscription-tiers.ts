@@ -26,6 +26,8 @@ export const SUBSCRIPTION_TIERS = {
     name: "Bestellen",
     productIds: ["prod_TYAfzP0Dw0QUCD"],
     features: [
+      "Alles van Basis & Pro",
+      "Meertalige menu's (NL, EN, DE, FR)",
       "Online bestellingen ontvangen",
       "Afhalen & bezorging",
       "Bestellingendashboard",
