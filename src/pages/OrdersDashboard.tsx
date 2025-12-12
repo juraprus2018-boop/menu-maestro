@@ -79,8 +79,13 @@ const OrdersDashboard = () => {
       const { data, error } = await supabase.functions.invoke("check-subscription");
       if (error) throw error;
       
+      // Check if user has ordering subscription either via product_ids array or main product_id
       const productIds = data?.product_ids || [];
-      setHasOrdering(hasOrderingSubscription(productIds));
+      const mainProductId = data?.product_id;
+      const hasOrderingViaArray = hasOrderingSubscription(productIds);
+      const hasOrderingViaMain = mainProductId === "prod_TYAfzP0Dw0QUCD";
+      
+      setHasOrdering(hasOrderingViaArray || hasOrderingViaMain);
     } catch (error) {
       console.error("Error checking subscription:", error);
       setHasOrdering(false);

@@ -337,19 +337,19 @@ const Pricing = () => {
               </TabsContent>
             </Tabs>
 
-            {/* Ordering Add-on */}
+            {/* Ordering Tier */}
             <div className="max-w-2xl mx-auto mt-12">
-              <h3 className="text-2xl font-bold font-serif text-center mb-6">Extra module</h3>
-              <Card className={`relative ${subscription?.hasOrdering ? "ring-2 ring-primary" : "border-dashed"}`}>
+              <h3 className="text-2xl font-bold font-serif text-center mb-6">Compleet pakket</h3>
+              <Card className={`relative ${subscription?.hasOrdering ? "ring-2 ring-primary" : ""}`}>
                 {subscription?.hasOrdering && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Actief</Badge>
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Huidig abonnement</Badge>
                 )}
                 <CardHeader>
                   <CardTitle className="font-serif flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5 text-primary" />
                     Bestellen
                   </CardTitle>
-                  <CardDescription>Laat gasten online bestellen via jouw menukaart</CardDescription>
+                  <CardDescription>Alles van Basis + Pro + online bestellingen</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="mb-6">
@@ -357,6 +357,18 @@ const Pricing = () => {
                     <span className="text-muted-foreground">/maand</span>
                   </div>
                   <ul className="space-y-3">
+                    {SUBSCRIPTION_TIERS.basic.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2">
+                        <Check className="h-5 w-5 text-primary" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                    {SUBSCRIPTION_TIERS.pro.features.filter(f => f !== "Alles van Basis").map((feature) => (
+                      <li key={feature} className="flex items-center gap-2">
+                        <Check className="h-5 w-5 text-primary" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
                     {SUBSCRIPTION_TIERS.ordering.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-2">
                         <Check className="h-5 w-5 text-primary" />
@@ -375,10 +387,10 @@ const Pricing = () => {
                     <Button 
                       className="w-full" 
                       onClick={() => handleSubscribe("ordering_monthly")} 
-                      disabled={loading === "ordering_monthly" || !subscription?.subscribed}
+                      disabled={loading === "ordering_monthly"}
                     >
                       {loading === "ordering_monthly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                      {!subscription?.subscribed ? "Eerst basis abonnement nodig" : "Voeg Bestellen toe"}
+                      Kies Bestellen
                     </Button>
                   )}
                 </CardFooter>

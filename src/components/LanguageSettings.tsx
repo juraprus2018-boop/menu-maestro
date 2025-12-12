@@ -29,7 +29,8 @@ const LanguageSettings = ({ restaurantId, enabledLanguages, onLanguagesChange }:
       const { data, error } = await supabase.functions.invoke("check-subscription");
       if (error) throw error;
       const tier = getTierFromProductId(data.product_id);
-      setHasPro(tier === "pro");
+      // Pro and Ordering tiers both have multi-language support
+      setHasPro(tier === "pro" || tier === "ordering");
     } catch (error) {
       console.error("Error checking subscription:", error);
     } finally {

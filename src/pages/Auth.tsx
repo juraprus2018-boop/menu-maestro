@@ -45,7 +45,7 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -60,6 +60,19 @@ const Auth = () => {
           },
         });
         if (error) throw error;
+        
+        // Send notification email to admin (fire and forget)
+        supabase.functions.invoke("send-new-account-notification", {
+          body: {
+            email,
+            companyName,
+            firstName,
+            lastName,
+            phone,
+            businessInfo,
+          },
+        }).catch(err => console.error("Failed to send notification:", err));
+        
         toast({
           title: "Account aangemaakt!",
           description: "U bent nu ingelogd.",

@@ -39,6 +39,40 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // First, check for admin subscriptions in local database
+    const { data: localSubs, error: localSubsError } = await supabaseClient
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("status", "active");
+
+    if (!localSubsError && localSubs && localSubs.length > 0) {
+      logStep("Found local subscriptions (admin)", { count: localSubs.length });
+      
+      const productIds: string[] = localSubs.map(s => s.plan);
+      const hasOrdering = productIds.some(id => id === "prod_TYAfzP0Dw0QUCD");
+      const hasPro = productIds.some(id => ["prod_TY9h8WNr3r36TZ", "prod_TY9iuwNnHskHUB"].includes(id));
+      const hasBasic = productIds.some(id => ["prod_TY8YjSp56UfCvH", "prod_TY8YRqbGHQQEL0"].includes(id));
+      
+      // Determine the main tier
+      let mainProductId = null;
+      if (hasOrdering) mainProductId = "prod_TYAfzP0Dw0QUCD";
+      else if (hasPro) mainProductId = productIds.find(id => ["prod_TY9h8WNr3r36TZ", "prod_TY9iuwNnHskHUB"].includes(id)) || null;
+      else if (hasBasic) mainProductId = productIds.find(id => ["prod_TY8YjSp56UfCvH", "prod_TY8YRqbGHQQEL0"].includes(id)) || null;
+
+      return new Response(JSON.stringify({
+        subscribed: true,
+        plan: "monthly",
+        product_id: mainProductId,
+        product_ids: productIds,
+        subscription_end: null, // Admin subs don't expire
+        is_admin_subscription: true
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     

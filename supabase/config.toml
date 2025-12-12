@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.verify-order-payment]
 verify_jwt = false
+
+[functions.send-new-account-notification]
+verify_jwt = false
