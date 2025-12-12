@@ -15,6 +15,43 @@ interface NewAccountRequest {
   businessInfo: string;
 }
 
+// Simple rate limiting map (in-memory, resets on function restart)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 5; // Max 5 requests per window
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour window
+
+function isRateLimited(identifier: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(identifier);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return false;
+  }
+  
+  if (record.count >= RATE_LIMIT) {
+    return true;
+  }
+  
+  record.count++;
+  return false;
+}
+
+// Sanitize inputs for HTML (basic XSS prevention)
+function sanitize(str: string | undefined): string {
+  if (!str) return '';
+  return str.replace(/[<>&"']/g, (char) => {
+    const entities: Record<string, string> = {
+      '<': '&lt;',
+      '>': '&gt;',
+      '&': '&amp;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return entities[char] || char;
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -23,28 +60,81 @@ serve(async (req) => {
   try {
     const { email, companyName, firstName, lastName, phone, businessInfo }: NewAccountRequest = await req.json();
 
+    // Validate required fields
+    if (!email || !companyName) {
+      console.error("Missing required fields: email or companyName");
+      return new Response(JSON.stringify({ error: "Missing required fields" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      console.error("Invalid email format:", email);
+      return new Response(JSON.stringify({ error: "Invalid email format" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Input length validation to prevent abuse
+    if (email.length > 255 || companyName.length > 200 || 
+        (firstName && firstName.length > 100) || 
+        (lastName && lastName.length > 100) ||
+        (phone && phone.length > 30) ||
+        (businessInfo && businessInfo.length > 1000)) {
+      console.error("Input too long");
+      return new Response(JSON.stringify({ error: "Input too long" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Rate limiting by email to prevent spam
+    if (isRateLimited(email)) {
+      console.error("Rate limited:", email);
+      return new Response(JSON.stringify({ error: "Too many requests" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 429,
+      });
+    }
+
     console.log("[NEW-ACCOUNT] Sending notification for:", email);
 
     // Initialize SMTP client
+    const smtpHost = Deno.env.get("SMTP_HOST");
+    const smtpPort = parseInt(Deno.env.get("SMTP_PORT") || "587");
+    const smtpUsername = Deno.env.get("SMTP_USERNAME");
+    const smtpPassword = Deno.env.get("SMTP_PASSWORD");
+    const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || "noreply@digitalemenukaart.nl";
+
+    if (!smtpHost || !smtpUsername || !smtpPassword) {
+      console.error("SMTP configuration missing");
+      return new Response(JSON.stringify({ error: "Email configuration error" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
+
     const client = new SMTPClient({
       connection: {
-        hostname: Deno.env.get("SMTP_HOST") || "",
-        port: parseInt(Deno.env.get("SMTP_PORT") || "587"),
+        hostname: smtpHost,
+        port: smtpPort,
         tls: true,
         auth: {
-          username: Deno.env.get("SMTP_USERNAME") || "",
-          password: Deno.env.get("SMTP_PASSWORD") || "",
+          username: smtpUsername,
+          password: smtpPassword,
         },
       },
     });
 
-    const fromEmail = Deno.env.get("SMTP_FROM_EMAIL") || "noreply@digitalemenukaart.nl";
-
-    // Send notification to admin
+    // Send notification to admin with sanitized inputs
     await client.send({
       from: fromEmail,
       to: "info@digitalemenukaart.nl",
-      subject: `Nieuw account aangemaakt: ${companyName}`,
+      subject: `Nieuw account aangemaakt: ${sanitize(companyName)}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -70,27 +160,27 @@ serve(async (req) => {
               
               <div class="field">
                 <div class="field-label">Bedrijfsnaam</div>
-                <div class="field-value">${companyName}</div>
+                <div class="field-value">${sanitize(companyName)}</div>
               </div>
               
               <div class="field">
                 <div class="field-label">Naam</div>
-                <div class="field-value">${firstName} ${lastName}</div>
+                <div class="field-value">${sanitize(firstName)} ${sanitize(lastName)}</div>
               </div>
               
               <div class="field">
                 <div class="field-label">E-mailadres</div>
-                <div class="field-value">${email}</div>
+                <div class="field-value">${sanitize(email)}</div>
               </div>
               
               <div class="field">
                 <div class="field-label">Telefoonnummer</div>
-                <div class="field-value">${phone}</div>
+                <div class="field-value">${sanitize(phone)}</div>
               </div>
               
               <div class="field">
                 <div class="field-label">Bedrijfsinfo & Interesse</div>
-                <div class="field-value">${businessInfo}</div>
+                <div class="field-value">${sanitize(businessInfo) || 'Geen informatie opgegeven'}</div>
               </div>
               
               <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">

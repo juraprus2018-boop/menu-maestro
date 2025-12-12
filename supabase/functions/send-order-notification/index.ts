@@ -19,22 +19,67 @@ serve(async (req) => {
 
   try {
     const { orderId, restaurantId }: OrderNotificationRequest = await req.json();
-    console.log("Sending order notification for order:", orderId);
+
+    // Validate required parameters
+    if (!orderId || !restaurantId) {
+      console.error("Missing required parameters: orderId or restaurantId");
+      return new Response(JSON.stringify({ error: "Missing required parameters" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(orderId) || !uuidRegex.test(restaurantId)) {
+      console.error("Invalid UUID format:", orderId, restaurantId);
+      return new Response(JSON.stringify({ error: "Invalid ID format" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    console.log("Processing order notification for:", orderId, "restaurant:", restaurantId);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch order details with items
+    // Fetch order details with validation that it belongs to the restaurant
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .select("*")
       .eq("id", orderId)
+      .eq("restaurant_id", restaurantId)
       .single();
 
     if (orderError || !order) {
-      console.error("Error fetching order:", orderError);
-      throw new Error("Order not found");
+      console.error("Order not found or doesn't belong to restaurant:", orderId, restaurantId, orderError);
+      return new Response(JSON.stringify({ error: "Order not found" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+
+    // Verify the order was created recently (within last 48 hours) to prevent abuse
+    const orderCreatedAt = new Date(order.created_at);
+    const now = new Date();
+    const hoursSinceCreation = (now.getTime() - orderCreatedAt.getTime()) / (1000 * 60 * 60);
+    if (hoursSinceCreation > 48) {
+      console.error("Order too old for notification:", orderId, "Created:", order.created_at);
+      return new Response(JSON.stringify({ error: "Order too old" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    // Verify order is actually paid before sending notification (for iDEAL payments)
+    if (order.payment_method === "ideal" && order.payment_status !== "paid") {
+      console.error("Order not paid yet, skipping notification:", orderId);
+      return new Response(JSON.stringify({ error: "Order not paid" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
     const { data: orderItems, error: itemsError } = await supabase
@@ -55,7 +100,10 @@ serve(async (req) => {
 
     if (restaurantError || !restaurant) {
       console.error("Error fetching restaurant:", restaurantError);
-      throw new Error("Restaurant not found");
+      return new Response(JSON.stringify({ error: "Restaurant not found" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
     }
 
     // Fetch restaurant owner's email from profiles
@@ -77,6 +125,14 @@ serve(async (req) => {
     const smtpUsername = Deno.env.get("SMTP_USERNAME")!;
     const smtpPassword = Deno.env.get("SMTP_PASSWORD")!;
     const smtpFromEmail = Deno.env.get("SMTP_FROM_EMAIL")!;
+
+    if (!smtpHost || !smtpUsername || !smtpPassword) {
+      console.error("SMTP configuration missing");
+      return new Response(JSON.stringify({ error: "Email configuration error" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
 
     const client = new SMTPClient({
       connection: {

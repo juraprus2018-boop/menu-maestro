@@ -8,14 +8,15 @@ import SEO from "@/components/SEO";
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("order_id");
+  const sessionId = searchParams.get("session_id");
   const [isVerifying, setIsVerifying] = useState(true);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const verifyPayment = async () => {
-      if (!orderId) {
-        setError("Geen order ID gevonden");
+      if (!orderId || !sessionId) {
+        setError("Geen order ID of sessie ID gevonden");
         setIsVerifying(false);
         return;
       }
@@ -23,10 +24,14 @@ export default function PaymentSuccess() {
       try {
         const { data, error: verifyError } = await supabase.functions.invoke(
           "verify-order-payment",
-          { body: { orderId } }
+          { body: { orderId, sessionId } }
         );
 
         if (verifyError) throw verifyError;
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
         
         setOrderNumber(data.order?.order_number);
       } catch (err) {
@@ -38,7 +43,7 @@ export default function PaymentSuccess() {
     };
 
     verifyPayment();
-  }, [orderId]);
+  }, [orderId, sessionId]);
 
   if (isVerifying) {
     return (
