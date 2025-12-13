@@ -74,8 +74,11 @@ const Auth = () => {
           },
         }).catch(err => console.error("Failed to send notification:", err));
         
-        // Show email verification message
-        setEmailSent(true);
+        toast({
+          title: "Account aangemaakt!",
+          description: "U wordt nu doorgestuurd naar uw dashboard.",
+        });
+        navigate("/dashboard");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
