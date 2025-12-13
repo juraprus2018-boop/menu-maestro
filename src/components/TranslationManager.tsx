@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Globe, Loader2, Save } from "lucide-react";
+import { Globe, Loader2, Save, Check, AlertCircle } from "lucide-react";
 import { SUPPORTED_LANGUAGES, LanguageCode } from "@/lib/subscription-tiers";
 
 interface Translation {
@@ -40,7 +40,11 @@ const TranslationManager = ({
   const [translations, setTranslations] = useState<Record<string, Record<string, string>>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>(enabledLanguages[0] || "en");
+
+  // Get languages excluding Dutch (base language)
+  const availableLanguages = SUPPORTED_LANGUAGES.filter(
+    lang => lang.code !== "nl" && enabledLanguages.includes(lang.code)
+  );
 
   useEffect(() => {
     fetchTranslations();
@@ -118,9 +122,12 @@ const TranslationManager = ({
     onClose?.();
   };
 
-  const availableLanguages = SUPPORTED_LANGUAGES.filter(
-    lang => lang.code !== "nl" && enabledLanguages.includes(lang.code)
-  );
+  // Calculate translation progress
+  const getTranslationProgress = (langCode: string) => {
+    const langTranslations = translations[langCode] || {};
+    const filledFields = fields.filter(f => langTranslations[f.name]?.trim()).length;
+    return { filled: filledFields, total: fields.length };
+  };
 
   if (loading) {
     return (
@@ -133,78 +140,119 @@ const TranslationManager = ({
   if (availableLanguages.length === 0) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-muted-foreground">
-          <Globe className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          <p>Geen extra talen ingeschakeld.</p>
-          <p className="text-sm">Ga naar restaurantinstellingen om talen toe te voegen.</p>
+        <CardContent className="py-8 text-center">
+          <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="font-semibold text-lg mb-2">Geen extra talen ingeschakeld</h3>
+          <p className="text-muted-foreground text-sm mb-4">
+            Om vertalingen toe te voegen moet u eerst extra talen inschakelen 
+            in de restaurantinstellingen.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Ga naar Restaurant bewerken → Meertalige menu's
+          </p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-serif flex items-center gap-2">
-          <Globe className="h-5 w-5 text-primary" />
-          Vertalingen: {entityName}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4">
-            {availableLanguages.map(lang => (
-              <TabsTrigger key={lang.code} value={lang.code}>
-                {lang.flag} {lang.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+    <div className="space-y-6">
+      {/* Header with info */}
+      <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-lg border border-primary/10">
+        <Globe className="h-5 w-5 text-primary mt-0.5" />
+        <div>
+          <h3 className="font-medium text-sm">Vertalingen voor: {entityName}</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Nederlands is de standaardtaal. Voeg hier vertalingen toe voor de andere ingeschakelde talen.
+          </p>
+        </div>
+      </div>
 
-          {availableLanguages.map(lang => (
-            <TabsContent key={lang.code} value={lang.code} className="space-y-4">
-              {fields.map(field => (
-                <div key={field.name} className="space-y-2">
-                  <Label htmlFor={`${lang.code}-${field.name}`}>
-                    {field.label}
-                    <span className="text-xs text-muted-foreground ml-2">
-                      (NL: {field.originalValue || "-"})
-                    </span>
-                  </Label>
-                  {field.multiline ? (
-                    <Textarea
-                      id={`${lang.code}-${field.name}`}
-                      value={translations[lang.code]?.[field.name] || ""}
-                      onChange={(e) => updateTranslation(lang.code, field.name, e.target.value)}
-                      placeholder={`${field.label} in ${lang.name}`}
-                      rows={3}
-                    />
+      {/* Language sections */}
+      <div className="space-y-6">
+        {availableLanguages.map(lang => {
+          const progress = getTranslationProgress(lang.code);
+          const isComplete = progress.filled === progress.total;
+
+          return (
+            <Card key={lang.code} className={isComplete ? "border-primary/30" : ""}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{lang.flag}</span>
+                    <div>
+                      <CardTitle className="text-base">{lang.name}</CardTitle>
+                      <CardDescription className="text-xs">
+                        {progress.filled} van {progress.total} velden ingevuld
+                      </CardDescription>
+                    </div>
+                  </div>
+                  {isComplete ? (
+                    <Badge variant="default" className="bg-primary/10 text-primary border-0">
+                      <Check className="h-3 w-3 mr-1" />
+                      Compleet
+                    </Badge>
                   ) : (
-                    <Input
-                      id={`${lang.code}-${field.name}`}
-                      value={translations[lang.code]?.[field.name] || ""}
-                      onChange={(e) => updateTranslation(lang.code, field.name, e.target.value)}
-                      placeholder={`${field.label} in ${lang.name}`}
-                    />
+                    <Badge variant="outline" className="text-muted-foreground">
+                      {Math.round((progress.filled / progress.total) * 100)}%
+                    </Badge>
                   )}
                 </div>
-              ))}
-            </TabsContent>
-          ))}
-        </Tabs>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {fields.map(field => (
+                  <div key={field.name} className="space-y-2">
+                    <Label 
+                      htmlFor={`${lang.code}-${field.name}`}
+                      className="text-sm font-medium"
+                    >
+                      {field.label}
+                    </Label>
+                    <div className="text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-md mb-2">
+                      <span className="font-medium">NL:</span> {field.originalValue || "(leeg)"}
+                    </div>
+                    {field.multiline ? (
+                      <Textarea
+                        id={`${lang.code}-${field.name}`}
+                        value={translations[lang.code]?.[field.name] || ""}
+                        onChange={(e) => updateTranslation(lang.code, field.name, e.target.value)}
+                        placeholder={`${field.label} in het ${lang.name}`}
+                        rows={3}
+                        className="resize-none"
+                      />
+                    ) : (
+                      <Input
+                        id={`${lang.code}-${field.name}`}
+                        value={translations[lang.code]?.[field.name] || ""}
+                        onChange={(e) => updateTranslation(lang.code, field.name, e.target.value)}
+                        placeholder={`${field.label} in het ${lang.name}`}
+                      />
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
-        <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
-          {onClose && (
-            <Button variant="outline" onClick={onClose}>
-              Annuleren
-            </Button>
-          )}
-          <Button onClick={saveTranslations} disabled={saving}>
-            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-            Opslaan
+      {/* Actions */}
+      <div className="flex justify-end gap-3 pt-4 border-t">
+        {onClose && (
+          <Button variant="outline" onClick={onClose}>
+            Annuleren
           </Button>
-        </div>
-      </CardContent>
-    </Card>
+        )}
+        <Button onClick={saveTranslations} disabled={saving}>
+          {saving ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : (
+            <Save className="h-4 w-4 mr-2" />
+          )}
+          Vertalingen opslaan
+        </Button>
+      </div>
+    </div>
   );
 };
 
