@@ -28,6 +28,15 @@ import HowItWorks from "./pages/HowItWorks";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import PrijzenPage from "./pages/PrijzenPage";
+// Landing pages
+import MenukaartRestaurant from "./pages/landing/MenukaartRestaurant";
+import MenukaartCafe from "./pages/landing/MenukaartCafe";
+import MenukaartHotel from "./pages/landing/MenukaartHotel";
+import MenukaartStrandpaviljoen from "./pages/landing/MenukaartStrandpaviljoen";
+import MenukaartFoodtruck from "./pages/landing/MenukaartFoodtruck";
+import MenukaartEvenement from "./pages/landing/MenukaartEvenement";
+import MenukaartFrituur from "./pages/landing/MenukaartFrituur";
+import MenukaartLunchroom from "./pages/landing/MenukaartLunchroom";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +61,16 @@ const App = () => (
             <Route path="/hoe-werkt-het" element={<HowItWorks />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/algemene-voorwaarden" element={<Terms />} />
+            {/* SEO Landing pages */}
+            <Route path="/digitale-menukaart-restaurant" element={<MenukaartRestaurant />} />
+            <Route path="/digitale-menukaart-cafe" element={<MenukaartCafe />} />
+            <Route path="/digitale-menukaart-hotel" element={<MenukaartHotel />} />
+            <Route path="/digitale-menukaart-strandpaviljoen" element={<MenukaartStrandpaviljoen />} />
+            <Route path="/digitale-menukaart-foodtruck" element={<MenukaartFoodtruck />} />
+            <Route path="/digitale-menukaart-evenement" element={<MenukaartEvenement />} />
+            <Route path="/digitale-menukaart-frituur" element={<MenukaartFrituur />} />
+            <Route path="/digitale-menukaart-lunchroom" element={<MenukaartLunchroom />} />
+            {/* Dashboard routes */}
             <Route path="/dashboard/restaurant/new" element={<RestaurantForm />} />
             <Route path="/dashboard/restaurant/:id" element={<RestaurantForm />} />
             <Route path="/dashboard/restaurant/:id/menus" element={<MenuList />} />
