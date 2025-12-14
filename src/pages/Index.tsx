@@ -17,7 +17,14 @@ import {
   ExternalLink,
   MonitorSmartphone,
   ShoppingBag,
-  Truck
+  Truck,
+  UtensilsCrossed,
+  Coffee,
+  Building2,
+  Umbrella,
+  Pizza,
+  PartyPopper,
+  Sandwich
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -354,6 +361,72 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Voor Wie Section */}
+      <section className="py-20 bg-card">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <Badge className="mb-4">Voor wie</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold font-serif mb-4">
+              Perfect voor elk horecabedrijf
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Onze digitale menukaart is geschikt voor diverse horecaondernemingen
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <TargetCard
+              icon={<UtensilsCrossed className="h-8 w-8" />}
+              title="Restaurants"
+              description="Van bistro tot fine dining"
+              href="/digitale-menukaart-restaurant"
+            />
+            <TargetCard
+              icon={<Coffee className="h-8 w-8" />}
+              title="Cafés"
+              description="Koffiezaken en eetcafés"
+              href="/digitale-menukaart-cafe"
+            />
+            <TargetCard
+              icon={<Building2 className="h-8 w-8" />}
+              title="Hotels"
+              description="Roomservice en restaurants"
+              href="/digitale-menukaart-hotel"
+            />
+            <TargetCard
+              icon={<Umbrella className="h-8 w-8" />}
+              title="Strandpaviljoens"
+              description="Beachclubs en paviljoens"
+              href="/digitale-menukaart-strandpaviljoen"
+            />
+            <TargetCard
+              icon={<Truck className="h-8 w-8" />}
+              title="Foodtrucks"
+              description="Mobiele eetgelegenheden"
+              href="/digitale-menukaart-foodtruck"
+            />
+            <TargetCard
+              icon={<PartyPopper className="h-8 w-8" />}
+              title="Evenementen"
+              description="Festivals en catering"
+              href="/digitale-menukaart-evenement"
+            />
+            <TargetCard
+              icon={<Pizza className="h-8 w-8" />}
+              title="Frituren"
+              description="Snackbars en cafetaria's"
+              href="/digitale-menukaart-frituur"
+            />
+            <TargetCard
+              icon={<Sandwich className="h-8 w-8" />}
+              title="Lunchrooms"
+              description="Broodjes en lunchgerechten"
+              href="/digitale-menukaart-lunchroom"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Demo Section */}
       <section id="demo" className="py-20">
         <div className="container mx-auto px-4">
@@ -550,6 +623,18 @@ const DashboardFeature = ({ icon, title, description }: { icon: React.ReactNode;
       <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   </div>
+);
+
+const TargetCard = ({ icon, title, description, href }: { icon: React.ReactNode; title: string; description: string; href: string }) => (
+  <Link to={href}>
+    <Card className="bg-background hover:border-primary/50 hover:shadow-lg transition-all h-full cursor-pointer group">
+      <CardContent className="p-6 text-center">
+        <div className="text-primary mb-4 flex justify-center group-hover:scale-110 transition-transform">{icon}</div>
+        <h3 className="text-lg font-semibold mb-1 font-serif">{title}</h3>
+        <p className="text-muted-foreground text-sm">{description}</p>
+      </CardContent>
+    </Card>
+  </Link>
 );
 
 export default Index;
