@@ -15,7 +15,7 @@ const SEO = ({
   description,
   keywords = "digitale menukaart, QR code menu, restaurant menu, horeca, menukaart maken",
   canonicalUrl,
-  ogImage = "https://lovable.dev/opengraph-image-p98pqg.png",
+  ogImage = "https://digitalemenukaart.nl/og-image.png",
   ogType = "website",
   noIndex = false,
 }: SEOProps) => {
