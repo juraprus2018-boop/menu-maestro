@@ -24,6 +24,7 @@ export interface LandingPageConfig {
   title: string;
   metaTitle: string;
   metaDescription: string;
+  keywords?: string;
   heroTitle: string;
   heroSubtitle: string;
   badge: string;
@@ -83,6 +84,7 @@ const LandingPageTemplate = ({ config }: LandingPageTemplateProps) => {
       <SEO 
         title={config.metaTitle}
         description={config.metaDescription}
+        keywords={config.keywords}
         canonicalUrl={`/${config.slug}`}
       />
       <BreadcrumbSchema items={[

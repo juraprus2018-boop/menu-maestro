@@ -6,6 +6,7 @@ const config: LandingPageConfig = {
   title: "Digitale Menukaart Hotel",
   metaTitle: "Digitale Menukaart voor Hotels | Roomservice & Restaurant QR Menu",
   metaDescription: "Digitale menukaart voor hotels. Roomservice, restaurant, bar - alles in één QR-code. Meertalig voor internationale gasten. Probeer 30 dagen gratis.",
+  keywords: "digitale menukaart hotel, roomservice menu QR code, hotel restaurant menu, meertalig menu hotel, QR code hotel",
   badge: "Voor Hotels",
   heroTitle: "Digitale menukaart voor uw hotel",
   heroSubtitle: "Van roomservice tot het hotelrestaurant - bied uw internationale gasten een meertalige digitale menukaart. Professioneel en gastvrij.",

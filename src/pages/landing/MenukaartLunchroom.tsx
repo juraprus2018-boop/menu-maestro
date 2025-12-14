@@ -6,6 +6,7 @@ const config: LandingPageConfig = {
   title: "Digitale Menukaart Lunchroom",
   metaTitle: "Digitale Menukaart voor Lunchrooms | QR Menu voor Broodjes & Koffie",
   metaDescription: "Digitale menukaart voor lunchrooms en broodjeszaken. Broodjes, salades, koffie - alles overzichtelijk via QR-code. Allergenen duidelijk aangegeven. Probeer gratis.",
+  keywords: "digitale menukaart lunchroom, broodjeszaak menu QR code, lunchcafe menu digitaal, broodjes menu online, QR code lunchroom",
   badge: "Voor Lunchrooms",
   heroTitle: "Digitale menukaart voor uw lunchroom",
   heroSubtitle: "Van broodjes tot salades, van koffie tot verse sappen - presenteer uw hele aanbod via één handige QR-code. Inclusief allergeneninformatie voor bewuste gasten.",

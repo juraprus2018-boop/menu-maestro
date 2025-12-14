@@ -6,6 +6,7 @@ const config: LandingPageConfig = {
   title: "Digitale Menukaart Foodtruck",
   metaTitle: "Digitale Menukaart voor Foodtrucks | QR Menu Mobiel",
   metaDescription: "Digitale menukaart voor foodtrucks en mobiele horecaondernemers. QR-code op uw truck, klanten bestellen snel. Ideaal voor festivals en markten. Probeer gratis.",
+  keywords: "digitale menukaart foodtruck, food truck menu QR code, mobiel menu, festival menu digitaal, QR code foodtruck",
   badge: "Voor Foodtrucks",
   heroTitle: "Digitale menukaart voor uw foodtruck",
   heroSubtitle: "Klanten scannen, kiezen en weten direct wat u te bieden heeft. Perfect voor festivals, markten en vaste standplaatsen. Snel, modern en altijd actueel.",
