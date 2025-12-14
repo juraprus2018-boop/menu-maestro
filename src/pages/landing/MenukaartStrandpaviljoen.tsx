@@ -6,6 +6,7 @@ const config: LandingPageConfig = {
   title: "Digitale Menukaart Strandpaviljoen",
   metaTitle: "Digitale Menukaart voor Strandpaviljoens | QR Menu aan Zee",
   metaDescription: "Digitale menukaart voor strandpaviljoens en beachclubs. QR-code op de strandstoel, gasten bestellen direct. Ideaal voor seizoenslocaties. Probeer gratis.",
+  keywords: "digitale menukaart strandpaviljoen, beachclub menu QR code, strand menukaart, strandtent menu digitaal, QR code strandpaviljoen",
   badge: "Voor Strandpaviljoens",
   heroTitle: "Digitale menukaart voor uw strandpaviljoen",
   heroSubtitle: "Gasten liggen op het strand en bekijken uw kaart via hun telefoon. Van cocktails tot lunch - alles binnen handbereik. Perfect voor de seizoensdrukte.",

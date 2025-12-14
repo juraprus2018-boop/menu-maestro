@@ -6,6 +6,7 @@ const config: LandingPageConfig = {
   title: "Digitale Menukaart Frituur",
   metaTitle: "Digitale Menukaart voor Frituren & Snackbars | QR Menu Bestellen",
   metaDescription: "Digitale menukaart voor frituren en snackbars. Klanten scannen, kiezen en bestellen. Friet, snacks, sauzen - alles overzichtelijk. Probeer 30 dagen gratis.",
+  keywords: "digitale menukaart frituur, snackbar menu QR code, cafetaria menu digitaal, friet menu online, QR code frituur",
   badge: "Voor Frituren & Snackbars",
   heroTitle: "Digitale menukaart voor uw frituur",
   heroSubtitle: "Klanten scannen de QR-code bij de balie en kiezen rustig wat ze willen. Van friet tot frikandel - alles duidelijk op een rijtje. Modern en efficiënt.",

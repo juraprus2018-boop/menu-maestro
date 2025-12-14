@@ -6,6 +6,7 @@ const config: LandingPageConfig = {
   title: "Digitale Menukaart Restaurant",
   metaTitle: "Digitale Menukaart voor Restaurants | QR Menu Oplossing",
   metaDescription: "Professionele digitale menukaart voor restaurants. Gasten scannen QR-code en bekijken direct uw menu. Meerdere menu's, allergenen, real-time updates. Start gratis.",
+  keywords: "digitale menukaart restaurant, QR code menu restaurant, restaurant menukaart, digitaal menu horeca, menukaart maken restaurant",
   badge: "Voor Restaurants",
   heroTitle: "Digitale menukaart voor uw restaurant",
   heroSubtitle: "Bied uw gasten een moderne eetervaring. Geen stoffige papieren kaarten meer, maar een altijd actuele digitale menukaart die uw gerechten perfect presenteert.",

@@ -6,6 +6,7 @@ const config: LandingPageConfig = {
   title: "Digitale Menukaart Café",
   metaTitle: "Digitale Menukaart voor Cafés | QR Menu voor Horeca",
   metaDescription: "Digitale menukaart speciaal voor cafés en bars. QR-code op de bar of tafel, gasten scannen en bestellen. Drankkaart, snacks, specials. Probeer gratis.",
+  keywords: "digitale menukaart cafe, QR code menu café, drankkaart digitaal, cafe menukaart, bar menu QR code",
   badge: "Voor Cafés & Bars",
   heroTitle: "Digitale menukaart voor uw café",
   heroSubtitle: "Van bier tot borrelhapjes - laat uw gasten het complete aanbod bekijken via hun telefoon. Modern, snel en altijd actueel.",

@@ -6,6 +6,7 @@ const config: LandingPageConfig = {
   title: "Digitale Menukaart Evenement",
   metaTitle: "Digitale Menukaart voor Evenementen | QR Menu voor Festivals & Events",
   metaDescription: "Digitale menukaart voor evenementen, festivals en partijen. QR-codes voor eten en drinken. Makkelijk te beheren, snel aanpasbaar. Probeer 30 dagen gratis.",
+  keywords: "digitale menukaart evenement, festival menu QR code, event catering menu, bruiloft menu digitaal, bedrijfsfeest menukaart",
   badge: "Voor Evenementen",
   heroTitle: "Digitale menukaart voor uw evenement",
   heroSubtitle: "Festival, bedrijfsfeest of bruiloft - bied uw gasten een overzichtelijk menu via QR-code. Makkelijk te beheren, geen gedoe met papieren kaarten.",
