@@ -56,6 +56,51 @@ const Footer = () => {
             </ul>
           </div>
           <div>
+            <h4 className="font-semibold mb-4">Voor wie</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <Link to="/digitale-menukaart-restaurant" className="hover:text-foreground transition-colors">
+                  Restaurants
+                </Link>
+              </li>
+              <li>
+                <Link to="/digitale-menukaart-cafe" className="hover:text-foreground transition-colors">
+                  Cafés
+                </Link>
+              </li>
+              <li>
+                <Link to="/digitale-menukaart-hotel" className="hover:text-foreground transition-colors">
+                  Hotels
+                </Link>
+              </li>
+              <li>
+                <Link to="/digitale-menukaart-strandpaviljoen" className="hover:text-foreground transition-colors">
+                  Strandpaviljoens
+                </Link>
+              </li>
+              <li>
+                <Link to="/digitale-menukaart-foodtruck" className="hover:text-foreground transition-colors">
+                  Foodtrucks
+                </Link>
+              </li>
+              <li>
+                <Link to="/digitale-menukaart-evenement" className="hover:text-foreground transition-colors">
+                  Evenementen
+                </Link>
+              </li>
+              <li>
+                <Link to="/digitale-menukaart-frituur" className="hover:text-foreground transition-colors">
+                  Frituren
+                </Link>
+              </li>
+              <li>
+                <Link to="/digitale-menukaart-lunchroom" className="hover:text-foreground transition-colors">
+                  Lunchrooms
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
             <h4 className="font-semibold mb-4">Juridisch</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
