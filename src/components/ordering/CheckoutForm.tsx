@@ -95,59 +95,78 @@ export function CheckoutForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!customerName || !customerPhone) {
-      toast.error("Vul je naam en telefoonnummer in");
+    // Client-side validation (basic checks before sending to server)
+    if (!customerName || customerName.trim().length < 2) {
+      toast.error("Naam moet minimaal 2 tekens zijn");
       return;
     }
 
-    if (orderType === "delivery" && (!deliveryAddress || !deliveryPostalCode || !deliveryCity)) {
-      toast.error("Vul je bezorgadres in");
+    if (!customerPhone || customerPhone.trim().length < 6) {
+      toast.error("Vul een geldig telefoonnummer in");
       return;
+    }
+
+    if (customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+      toast.error("Vul een geldig e-mailadres in");
+      return;
+    }
+
+    if (orderType === "delivery") {
+      if (!deliveryAddress || deliveryAddress.trim().length < 5) {
+        toast.error("Vul een geldig bezorgadres in");
+        return;
+      }
+      if (!deliveryPostalCode || !/^[0-9]{4}\s?[A-Z]{2}$/i.test(deliveryPostalCode)) {
+        toast.error("Vul een geldige postcode in (formaat: 1234 AB)");
+        return;
+      }
+      if (!deliveryCity || deliveryCity.trim().length < 2) {
+        toast.error("Vul een geldige plaatsnaam in");
+        return;
+      }
     }
 
     setIsSubmitting(true);
 
     try {
-      // Create order
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          restaurant_id: restaurantId,
-          customer_name: customerName,
-          customer_phone: customerPhone,
-          customer_email: customerEmail || null,
-          order_type: orderType,
-          payment_method: paymentMethod,
-          delivery_address: orderType === "delivery" ? deliveryAddress : null,
-          delivery_postal_code: orderType === "delivery" ? deliveryPostalCode : null,
-          delivery_city: orderType === "delivery" ? deliveryCity : null,
-          subtotal,
-          delivery_fee: deliveryFee,
-          total,
-          notes: notes || null,
-          estimated_time: estimatedTime,
-          requested_time: requestedTime === "asap" ? null : requestedTime,
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      // Create order items
+      // Create order via secure edge function with server-side validation
       const orderItems = items.map((item) => ({
-        order_id: order.id,
-        menu_item_id: item.menuItemId,
-        item_name: item.name,
-        item_price: item.price,
+        menuItemId: item.menuItemId,
+        name: item.name,
+        price: item.price,
         quantity: item.quantity,
-        notes: item.notes || null,
+        notes: item.notes || undefined,
       }));
 
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
+      const { data: orderData, error: orderError } = await supabase.functions.invoke(
+        "create-order",
+        {
+          body: {
+            restaurantId,
+            customerName: customerName.trim(),
+            customerPhone: customerPhone.trim(),
+            customerEmail: customerEmail?.trim() || undefined,
+            orderType,
+            paymentMethod,
+            deliveryAddress: orderType === "delivery" ? deliveryAddress.trim() : undefined,
+            deliveryPostalCode: orderType === "delivery" ? deliveryPostalCode.trim() : undefined,
+            deliveryCity: orderType === "delivery" ? deliveryCity.trim() : undefined,
+            subtotal,
+            deliveryFee,
+            total,
+            notes: notes?.trim() || undefined,
+            estimatedTime,
+            requestedTime,
+            items: orderItems,
+          },
+        }
+      );
 
-      if (itemsError) throw itemsError;
+      if (orderError || !orderData?.success) {
+        throw new Error(orderData?.error || "Kon bestelling niet aanmaken");
+      }
+
+      const order = orderData.order;
 
       // Handle iDEAL payment - redirect to Stripe
       if (paymentMethod === "ideal") {
@@ -159,7 +178,7 @@ export function CheckoutForm({
               customerEmail: customerEmail || undefined,
               customerName,
               totalAmount: total,
-              restaurantName,
+              restaurantName: orderData.restaurantName,
             },
           }
         );
@@ -181,9 +200,9 @@ export function CheckoutForm({
       toast.success(`Bestelling #${order.order_number} is geplaatst!`);
       onOrderComplete();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating order:", error);
-      toast.error("Er ging iets mis bij het plaatsen van je bestelling");
+      toast.error(error.message || "Er ging iets mis bij het plaatsen van je bestelling");
     } finally {
       setIsSubmitting(false);
     }
