@@ -43,10 +43,10 @@ export function DashboardSidebar({ restaurants, isAdmin }: DashboardSidebarProps
 
         {/* Abonnement */}
         <Link
-          to="/prijzen"
+          to="/dashboard/subscription"
           className={cn(
             "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-            isActive("/prijzen")
+            isActive("/dashboard/subscription")
               ? "bg-primary text-primary-foreground"
               : "hover:bg-muted text-muted-foreground hover:text-foreground"
           )}
