@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CartItem } from "@/hooks/useCart";
-import { Loader2 } from "lucide-react";
+import { Loader2, Clock } from "lucide-react";
 
 interface OrderingSettings {
   accepts_pickup: boolean;
@@ -30,6 +31,32 @@ interface CheckoutFormProps {
   restaurantName: string;
   orderingSettings: OrderingSettings;
   onOrderComplete: () => void;
+}
+
+// Generate time slots for the next 3 hours in 15 minute intervals
+function generateTimeSlots(): { value: string; label: string }[] {
+  const slots: { value: string; label: string }[] = [
+    { value: "asap", label: "Zo snel mogelijk" }
+  ];
+  
+  const now = new Date();
+  const roundedMinutes = Math.ceil(now.getMinutes() / 15) * 15;
+  now.setMinutes(roundedMinutes, 0, 0);
+  
+  // Add 30 minutes minimum prep time
+  now.setMinutes(now.getMinutes() + 30);
+  
+  for (let i = 0; i < 12; i++) { // 3 hours = 12 slots of 15 minutes
+    const slotTime = new Date(now.getTime() + i * 15 * 60 * 1000);
+    const hours = slotTime.getHours().toString().padStart(2, "0");
+    const minutes = slotTime.getMinutes().toString().padStart(2, "0");
+    slots.push({
+      value: slotTime.toISOString(),
+      label: `${hours}:${minutes}`
+    });
+  }
+  
+  return slots;
 }
 
 export function CheckoutForm({
@@ -55,8 +82,10 @@ export function CheckoutForm({
   const [deliveryPostalCode, setDeliveryPostalCode] = useState("");
   const [deliveryCity, setDeliveryCity] = useState("");
   const [notes, setNotes] = useState("");
+  const [requestedTime, setRequestedTime] = useState("asap");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const timeSlots = generateTimeSlots();
   const deliveryFee = orderType === "delivery" ? (orderingSettings.delivery_fee || 0) : 0;
   const total = subtotal + deliveryFee;
   const estimatedTime = orderType === "pickup" 
@@ -97,6 +126,7 @@ export function CheckoutForm({
           total,
           notes: notes || null,
           estimated_time: estimatedTime,
+          requested_time: requestedTime === "asap" ? null : requestedTime,
         })
         .select()
         .single();
@@ -191,6 +221,26 @@ export function CheckoutForm({
               </RadioGroup>
             </div>
           )}
+
+          {/* Requested Time */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Gewenst tijdstip
+            </Label>
+            <Select value={requestedTime} onValueChange={setRequestedTime}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {timeSlots.map((slot) => (
+                  <SelectItem key={slot.value} value={slot.value}>
+                    {slot.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Customer Details */}
           <div className="space-y-4">
@@ -315,7 +365,12 @@ export function CheckoutForm({
               <span>Totaal</span>
               <span>€{total.toFixed(2)}</span>
             </div>
-            {estimatedTime && (
+            {requestedTime !== "asap" && (
+              <p className="text-sm text-muted-foreground text-center">
+                Gewenst tijdstip: {new Date(requestedTime).toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}
+              </p>
+            )}
+            {requestedTime === "asap" && estimatedTime && (
               <p className="text-sm text-muted-foreground text-center">
                 Geschatte tijd: ~{estimatedTime} minuten
               </p>

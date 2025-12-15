@@ -45,6 +45,7 @@ const statusColors: Record<string, string> = {
   confirmed: "bg-yellow-500",
   preparing: "bg-orange-500",
   ready: "bg-green-500",
+  out_for_delivery: "bg-purple-500",
   delivered: "bg-gray-500",
   cancelled: "bg-red-500",
 };
@@ -54,6 +55,7 @@ const statusLabels: Record<string, string> = {
   confirmed: "Bevestigd",
   preparing: "In bereiding",
   ready: "Klaar",
+  out_for_delivery: "Onderweg",
   delivered: "Bezorgd/Afgehaald",
   cancelled: "Geannuleerd",
 };
@@ -211,14 +213,25 @@ const OrdersDashboard = () => {
     }
   };
 
-  const getNextStatus = (currentStatus: string): string | null => {
-    const flow: Record<string, string> = {
-      new: "confirmed",
-      confirmed: "preparing",
-      preparing: "ready",
-      ready: "delivered",
-    };
-    return flow[currentStatus] || null;
+  const getNextStatus = (currentStatus: string, orderType: string): string | null => {
+    if (orderType === "delivery") {
+      const flow: Record<string, string> = {
+        new: "confirmed",
+        confirmed: "preparing",
+        preparing: "ready",
+        ready: "out_for_delivery",
+        out_for_delivery: "delivered",
+      };
+      return flow[currentStatus] || null;
+    } else {
+      const flow: Record<string, string> = {
+        new: "confirmed",
+        confirmed: "preparing",
+        preparing: "ready",
+        ready: "delivered",
+      };
+      return flow[currentStatus] || null;
+    }
   };
 
   if (checkingSubscription) {
@@ -282,6 +295,7 @@ const OrdersDashboard = () => {
                 <SelectItem value="confirmed">Bevestigd</SelectItem>
                 <SelectItem value="preparing">In bereiding</SelectItem>
                 <SelectItem value="ready">Klaar</SelectItem>
+                <SelectItem value="out_for_delivery">Onderweg</SelectItem>
                 <SelectItem value="delivered">Bezorgd/Afgehaald</SelectItem>
                 <SelectItem value="cancelled">Geannuleerd</SelectItem>
               </SelectContent>
@@ -382,15 +396,15 @@ const OrdersDashboard = () => {
                         {order.payment_status === "paid" && "Betaald"}
                       </p>
                     </div>
-                    {getNextStatus(order.order_status) && (
+                    {getNextStatus(order.order_status, order.order_type) && (
                       <Button
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          updateOrderStatus(order.id, getNextStatus(order.order_status)!);
+                          updateOrderStatus(order.id, getNextStatus(order.order_status, order.order_type)!);
                         }}
                       >
-                        {statusLabels[getNextStatus(order.order_status)!]}
+                        {statusLabels[getNextStatus(order.order_status, order.order_type)!]}
                       </Button>
                     )}
                   </div>

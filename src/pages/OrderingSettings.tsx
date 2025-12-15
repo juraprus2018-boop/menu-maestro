@@ -12,7 +12,7 @@ import { OpeningHoursEditor, OpeningHours, defaultOpeningHours } from "@/compone
 import { Json } from "@/integrations/supabase/types";
 import { hasOrderingSubscription } from "@/lib/subscription-tiers";
 
-interface OrderingSettings {
+interface OrderingSettingsData {
   id?: string;
   restaurant_id: string;
   is_ordering_enabled: boolean;
@@ -26,9 +26,10 @@ interface OrderingSettings {
   accepts_card: boolean;
   accepts_ideal: boolean;
   opening_hours: OpeningHours;
+  delivery_radius_km: number;
 }
 
-const OrderingSettings = () => {
+const OrderingSettingsPage = () => {
   const navigate = useNavigate();
   const { id: restaurantId } = useParams();
   const { toast } = useToast();
@@ -36,7 +37,7 @@ const OrderingSettings = () => {
   const [saving, setSaving] = useState(false);
   const [hasOrdering, setHasOrdering] = useState(false);
   const [checkingSubscription, setCheckingSubscription] = useState(true);
-  const [settings, setSettings] = useState<OrderingSettings>({
+  const [settings, setSettings] = useState<OrderingSettingsData>({
     restaurant_id: restaurantId || "",
     is_ordering_enabled: false,
     accepts_pickup: true,
@@ -49,6 +50,7 @@ const OrderingSettings = () => {
     accepts_card: true,
     accepts_ideal: true,
     opening_hours: defaultOpeningHours,
+    delivery_radius_km: 10,
   });
 
   useEffect(() => {
@@ -91,6 +93,7 @@ const OrderingSettings = () => {
         setSettings({
           ...data,
           opening_hours: (data.opening_hours as unknown as OpeningHours) || defaultOpeningHours,
+          delivery_radius_km: (data as any).delivery_radius_km || 10,
         });
       }
     } catch (error) {
@@ -301,6 +304,21 @@ const OrderingSettings = () => {
                 onChange={(e) => setSettings({ ...settings, delivery_fee: parseFloat(e.target.value) || 0 })}
               />
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="delivery-radius">Bezorgradius (km)</Label>
+              <Input
+                id="delivery-radius"
+                type="number"
+                step="1"
+                min="1"
+                max="100"
+                value={settings.delivery_radius_km}
+                onChange={(e) => setSettings({ ...settings, delivery_radius_km: parseFloat(e.target.value) || 10 })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Maximale afstand voor bezorgingen vanaf uw locatie
+              </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -341,4 +359,4 @@ const OrderingSettings = () => {
   );
 };
 
-export default OrderingSettings;
+export default OrderingSettingsPage;

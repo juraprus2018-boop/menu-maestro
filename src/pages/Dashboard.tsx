@@ -3,12 +3,11 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Plus, QrCode, LogOut, Settings, Store, Menu, CreditCard, AlertTriangle, Shield } from "lucide-react";
+import { Plus, Store, Menu, Settings, QrCode, ShoppingBag, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { format, isPast, differenceInDays } from "date-fns";
-import { nl } from "date-fns/locale";
 import SEO from "@/components/SEO";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+
 interface Restaurant {
   id: string;
   name: string;
@@ -17,37 +16,19 @@ interface Restaurant {
   created_at: string;
 }
 
-interface Profile {
-  trial_ends_at: string;
-}
-
-interface SubscriptionStatus {
-  subscribed: boolean;
-  plan: string | null;
-  subscription_end: string | null;
-}
-
 const Dashboard = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // Check for successful checkout
     if (searchParams.get("checkout") === "success") {
       toast({
         title: "Betaling geslaagd!",
         description: "Je abonnement is nu actief.",
       });
-      // Refresh subscription status
-      checkSubscription();
     }
   }, [searchParams]);
 
@@ -56,8 +37,7 @@ const Dashboard = () => {
       if (!session) {
         navigate("/auth");
       } else {
-        setUserEmail(session.user.email ?? null);
-        setUserId(session.user.id);
+        fetchRestaurants();
       }
     });
 
@@ -65,53 +45,12 @@ const Dashboard = () => {
       if (!session) {
         navigate("/auth");
       } else {
-        setUserEmail(session.user.email ?? null);
-        setUserId(session.user.id);
         fetchRestaurants();
-        fetchProfile(session.user.id);
-        checkSubscription();
-        checkAdminRole(session.user.id);
       }
     });
 
     return () => authSub.unsubscribe();
   }, [navigate]);
-
-  const fetchProfile = async (uid: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("trial_ends_at")
-      .eq("user_id", uid)
-      .maybeSingle();
-
-    if (!error && data) {
-      setProfile(data);
-    }
-  };
-
-  const checkSubscription = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke("check-subscription");
-      if (!error && data) {
-        setSubscription(data);
-      }
-    } catch (error) {
-      console.error("Error checking subscription:", error);
-    }
-  };
-
-  const checkAdminRole = async (uid: string) => {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", uid)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (!error && data) {
-      setIsAdmin(true);
-    }
-  };
 
   const fetchRestaurants = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -135,204 +74,151 @@ const Dashboard = () => {
     setLoading(false);
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
-
-  const getTrialInfo = () => {
-    // Admins krijgen geen trial/abonnement info te zien
-    if (isAdmin) return null;
-    
-    if (!profile) return null;
-    
-    const trialEndDate = new Date(profile.trial_ends_at);
-    const trialEnded = isPast(trialEndDate);
-    const daysLeft = differenceInDays(trialEndDate, new Date());
-
-    if (subscription?.subscribed) {
-      return {
-        status: "subscribed",
-        message: `${subscription.plan === "yearly" ? "Jaarlijks" : "Maandelijks"} abonnement`,
-        variant: "default" as const,
-      };
-    }
-
-    if (trialEnded) {
-      return {
-        status: "expired",
-        message: "Proefperiode verlopen",
-        variant: "destructive" as const,
-      };
-    }
-
-    return {
-      status: "trial",
-      message: `Nog ${daysLeft} ${daysLeft === 1 ? "dag" : "dagen"} proefperiode`,
-      variant: "secondary" as const,
-    };
-  };
-
-  const trialInfo = getTrialInfo();
-
   return (
-    <div className="min-h-screen bg-background">
+    <DashboardLayout title="Overzicht">
       <SEO 
         title="Dashboard"
         description="Beheer uw restaurants en digitale menukaarten. Voeg menu's toe, bewerk gerechten en download QR-codes."
         noIndex={true}
       />
-      {/* Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <QrCode className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground font-serif">Digitale Menukaart</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            {isAdmin && (
-              <Link to="/admin">
-                <Button variant="outline" size="sm">
-                  <Shield className="h-4 w-4 mr-2" />
-                  Admin
-                </Button>
-              </Link>
-            )}
-            <span className="text-sm text-muted-foreground hidden sm:inline">
-              {userEmail}
-            </span>
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Trial/Subscription Banner */}
-      {trialInfo && trialInfo.status === "expired" && (
-        <div className="bg-destructive/10 border-b border-destructive/20">
-          <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
-              <span className="text-sm font-medium">
-                Je proefperiode is verlopen. Activeer een abonnement om door te gaan.
-              </span>
-            </div>
-            <Link to="/pricing">
-              <Button size="sm">
-                <CreditCard className="h-4 w-4 mr-2" />
-                Bekijk abonnementen
-              </Button>
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      
+      <div className="p-6">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-3xl font-bold font-serif">Mijn Restaurants</h1>
-              {trialInfo && (
-                <Badge variant={trialInfo.variant}>{trialInfo.message}</Badge>
-              )}
-            </div>
+            <h1 className="text-3xl font-bold font-serif">Welkom terug</h1>
             <p className="text-muted-foreground mt-1">
-              Beheer uw restaurants en menu's
+              Beheer uw restaurants en digitale menukaarten
             </p>
           </div>
-          <div className="flex gap-2">
-            <Link to="/pricing">
-              <Button variant="outline">
-                <CreditCard className="mr-2 h-4 w-4" />
-                Abonnement
-              </Button>
-            </Link>
-            <Link to="/dashboard/restaurant/new">
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Restaurant toevoegen
-              </Button>
-            </Link>
-          </div>
+          <Link to="/dashboard/restaurant/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nieuw restaurant
+            </Button>
+          </Link>
         </div>
 
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardHeader>
-                  <div className="h-6 bg-muted rounded w-3/4" />
-                  <div className="h-4 bg-muted rounded w-1/2 mt-2" />
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        ) : restaurants.length === 0 ? (
-          <Card className="text-center py-12">
-            <CardContent>
-              <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Nog geen restaurants</h2>
-              <p className="text-muted-foreground mb-6">
-                Voeg uw eerste restaurant toe om te beginnen met uw digitale menukaarten.
-              </p>
-              <Link to="/dashboard/restaurant/new">
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Restaurant toevoegen
-                </Button>
-              </Link>
-            </CardContent>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Actieve restaurants</CardDescription>
+              <CardTitle className="text-3xl">{restaurants.length}</CardTitle>
+            </CardHeader>
           </Card>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {restaurants.map((restaurant) => (
-              <Card key={restaurant.id} className="hover:border-primary/50 transition-colors">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      {restaurant.logo_url ? (
-                        <img
-                          src={restaurant.logo_url}
-                          alt={restaurant.name}
-                          className="w-12 h-12 rounded-lg object-cover"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Store className="h-6 w-6 text-primary" />
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Totaal menu's</CardDescription>
+              <CardTitle className="text-3xl">-</CardTitle>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Bestellingen vandaag</CardDescription>
+              <CardTitle className="text-3xl">-</CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+
+        {/* Restaurants */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Uw restaurants</h2>
+          
+          {loading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-6 bg-muted rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-1/2 mt-2" />
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          ) : restaurants.length === 0 ? (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <h2 className="text-xl font-semibold mb-2">Nog geen restaurants</h2>
+                <p className="text-muted-foreground mb-6">
+                  Voeg uw eerste restaurant toe om te beginnen met uw digitale menukaarten.
+                </p>
+                <Link to="/dashboard/restaurant/new">
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Restaurant toevoegen
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {restaurants.map((restaurant) => (
+                <Card key={restaurant.id} className="hover:border-primary/50 transition-colors">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        {restaurant.logo_url ? (
+                          <img
+                            src={restaurant.logo_url}
+                            alt={restaurant.name}
+                            className="w-12 h-12 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <Store className="h-6 w-6 text-primary" />
+                          </div>
+                        )}
+                        <div>
+                          <CardTitle className="font-serif">{restaurant.name}</CardTitle>
+                          <CardDescription className="text-xs">
+                            /{restaurant.slug}
+                          </CardDescription>
                         </div>
-                      )}
-                      <div>
-                        <CardTitle className="font-serif">{restaurant.name}</CardTitle>
-                        <CardDescription className="text-xs">
-                          /{restaurant.slug}
-                        </CardDescription>
                       </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2">
-                    <Link to={`/dashboard/restaurant/${restaurant.id}/menus`} className="flex-1">
-                      <Button variant="outline" className="w-full">
-                        <Menu className="mr-2 h-4 w-4" />
-                        Menu's
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link to={`/dashboard/restaurant/${restaurant.id}/menus`}>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Menu className="mr-1 h-3 w-3" />
+                          Menu's
+                        </Button>
+                      </Link>
+                      <Link to={`/dashboard/restaurant/${restaurant.id}/orders`}>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <ShoppingBag className="mr-1 h-3 w-3" />
+                          Bestellingen
+                        </Button>
+                      </Link>
+                      <Link to={`/dashboard/restaurant/${restaurant.id}/qr`}>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <QrCode className="mr-1 h-3 w-3" />
+                          QR-code
+                        </Button>
+                      </Link>
+                      <Link to={`/dashboard/restaurant/${restaurant.id}`}>
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Settings className="mr-1 h-3 w-3" />
+                          Instellingen
+                        </Button>
+                      </Link>
+                    </div>
+                    <Link to={`/menu/${restaurant.slug}`} target="_blank">
+                      <Button variant="ghost" size="sm" className="w-full mt-2">
+                        <Eye className="mr-1 h-3 w-3" />
+                        Bekijk menukaart
                       </Button>
                     </Link>
-                    <Link to={`/dashboard/restaurant/${restaurant.id}`}>
-                      <Button variant="outline" size="icon">
-                        <Settings className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
