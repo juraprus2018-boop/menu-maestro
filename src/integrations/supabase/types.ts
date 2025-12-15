@@ -219,6 +219,7 @@ export type Database = {
           order_type: string
           payment_method: string
           payment_status: string
+          requested_time: string | null
           restaurant_id: string
           subtotal: number
           total: number
@@ -241,6 +242,7 @@ export type Database = {
           order_type: string
           payment_method: string
           payment_status?: string
+          requested_time?: string | null
           restaurant_id: string
           subtotal: number
           total: number
@@ -263,6 +265,7 @@ export type Database = {
           order_type?: string
           payment_method?: string
           payment_status?: string
+          requested_time?: string | null
           restaurant_id?: string
           subtotal?: number
           total?: number
@@ -329,6 +332,7 @@ export type Database = {
           accepts_pickup: boolean
           created_at: string
           delivery_fee: number | null
+          delivery_radius_km: number | null
           estimated_delivery_time: number | null
           estimated_pickup_time: number | null
           id: string
@@ -346,6 +350,7 @@ export type Database = {
           accepts_pickup?: boolean
           created_at?: string
           delivery_fee?: number | null
+          delivery_radius_km?: number | null
           estimated_delivery_time?: number | null
           estimated_pickup_time?: number | null
           id?: string
@@ -363,6 +368,7 @@ export type Database = {
           accepts_pickup?: boolean
           created_at?: string
           delivery_fee?: number | null
+          delivery_radius_km?: number | null
           estimated_delivery_time?: number | null
           estimated_pickup_time?: number | null
           id?: string
