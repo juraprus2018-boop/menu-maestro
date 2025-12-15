@@ -16,6 +16,7 @@ import QRCode from "./pages/QRCode";
 import RestaurantMenuOverview from "./pages/RestaurantMenuOverview";
 import PublicMenu from "./pages/PublicMenu";
 import OrdersDashboard from "./pages/OrdersDashboard";
+import SubscriptionDashboard from "./pages/SubscriptionDashboard";
 import OrderingSettings from "./pages/OrderingSettings";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancelled from "./pages/PaymentCancelled";
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="/digitale-menukaart-frituur" element={<MenukaartFrituur />} />
             <Route path="/digitale-menukaart-lunchroom" element={<MenukaartLunchroom />} />
             {/* Dashboard routes */}
+            <Route path="/dashboard/subscription" element={<SubscriptionDashboard />} />
             <Route path="/dashboard/restaurant/new" element={<RestaurantForm />} />
             <Route path="/dashboard/restaurant/:id" element={<RestaurantForm />} />
             <Route path="/dashboard/restaurant/:id/menus" element={<MenuList />} />
