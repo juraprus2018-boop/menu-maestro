@@ -143,13 +143,25 @@ export function DashboardSidebar({ restaurants, isAdmin }: DashboardSidebarProps
                         to={`/dashboard/restaurant/${restaurant.id}/orders`}
                         className={cn(
                           "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors",
-                          isActive(`/dashboard/restaurant/${restaurant.id}/orders`)
+                          location.pathname.includes(`/dashboard/restaurant/${restaurant.id}/orders`)
                             ? "bg-primary/10 text-primary font-medium"
                             : "hover:bg-muted text-muted-foreground hover:text-foreground"
                         )}
                       >
                         <ShoppingBag className="h-3.5 w-3.5" />
                         Bestellingen
+                      </Link>
+                      <Link
+                        to={`/dashboard/restaurant/${restaurant.id}/ordering-settings`}
+                        className={cn(
+                          "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors",
+                          isActive(`/dashboard/restaurant/${restaurant.id}/ordering-settings`)
+                            ? "bg-primary/10 text-primary font-medium"
+                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <Settings className="h-3.5 w-3.5" />
+                        Bestel instellingen
                       </Link>
                     </div>
                   )}
