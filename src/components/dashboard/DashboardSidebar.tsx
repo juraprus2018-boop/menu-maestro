@@ -82,22 +82,31 @@ export function DashboardSidebar({ restaurants, isAdmin }: DashboardSidebarProps
                 <div key={restaurant.id} className="space-y-1">
                   <div
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium",
+                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                       isRestaurantActive(restaurant.id)
-                        ? "bg-muted"
-                        : ""
+                        ? "bg-primary/10 text-primary border-l-2 border-primary"
+                        : "text-muted-foreground"
                     )}
                   >
                     {restaurant.logo_url ? (
                       <img
                         src={restaurant.logo_url}
                         alt={restaurant.name}
-                        className="h-5 w-5 rounded object-cover"
+                        className={cn(
+                          "h-5 w-5 rounded object-cover",
+                          isRestaurantActive(restaurant.id) && "ring-2 ring-primary ring-offset-1"
+                        )}
                       />
                     ) : (
-                      <Store className="h-4 w-4 text-muted-foreground" />
+                      <Store className={cn(
+                        "h-4 w-4",
+                        isRestaurantActive(restaurant.id) ? "text-primary" : "text-muted-foreground"
+                      )} />
                     )}
-                    <span className="truncate flex-1">{restaurant.name}</span>
+                    <span className={cn(
+                      "truncate flex-1",
+                      isRestaurantActive(restaurant.id) && "font-semibold"
+                    )}>{restaurant.name}</span>
                   </div>
 
                   {/* Sub-navigation - always visible */}
