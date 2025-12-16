@@ -100,8 +100,7 @@ export function DashboardSidebar({ restaurants, isAdmin }: DashboardSidebarProps
                     <span className="truncate flex-1">{restaurant.name}</span>
                   </div>
 
-                  {/* Sub-navigation for active restaurant */}
-                  {isRestaurantActive(restaurant.id) && (
+                  {/* Sub-navigation - always visible */}
                     <div className="ml-4 pl-4 border-l border-border space-y-1">
                       <Link
                         to={`/dashboard/restaurant/${restaurant.id}`}
@@ -164,7 +163,6 @@ export function DashboardSidebar({ restaurants, isAdmin }: DashboardSidebarProps
                         Bestel instellingen
                       </Link>
                     </div>
-                  )}
                 </div>
               ))}
             </div>
