@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Save, Lock } from "lucide-react";
+import { Loader2, Save, Lock } from "lucide-react";
 import { OpeningHoursEditor, OpeningHours, defaultOpeningHours } from "@/components/OpeningHoursEditor";
 import { Json } from "@/integrations/supabase/types";
 import { hasOrderingSubscription } from "@/lib/subscription-tiers";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 interface OrderingSettingsData {
   id?: string;
@@ -141,24 +142,18 @@ const OrderingSettingsPage = () => {
 
   if (loading || checkingSubscription) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      <DashboardLayout title="Bestelinstellingen">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </DashboardLayout>
     );
   }
 
   if (!hasOrdering) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="bg-card border-b border-border">
-          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(`/dashboard/restaurant/${restaurantId}`)}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl font-bold font-serif text-primary">Bestelinstellingen</h1>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 py-12 max-w-lg">
+      <DashboardLayout title="Bestelinstellingen">
+        <div className="p-6 max-w-lg mx-auto">
           <Card>
             <CardHeader className="text-center">
               <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -173,29 +168,22 @@ const OrderingSettingsPage = () => {
               </Button>
             </CardContent>
           </Card>
-        </main>
-      </div>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(`/dashboard/restaurant/${restaurantId}/orders`)}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl font-bold font-serif text-primary">Bestelinstellingen</h1>
-          </div>
+    <DashboardLayout title="Bestelinstellingen">
+      <div className="p-6 max-w-2xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold font-serif">Bestelinstellingen</h1>
           <Button onClick={handleSave} disabled={saving}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
             Opslaan
           </Button>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-2xl space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Algemeen</CardTitle>
@@ -354,8 +342,8 @@ const OrderingSettingsPage = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

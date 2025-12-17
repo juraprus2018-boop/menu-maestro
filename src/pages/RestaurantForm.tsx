@@ -10,11 +10,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Loader2, Upload, QrCode, Menu, Palette, Globe, ShoppingBag, ImageIcon } from "lucide-react";
+import { Loader2, Upload, Menu, Palette, Globe, ShoppingBag, ImageIcon } from "lucide-react";
 import { themes, MenuTheme } from "@/lib/menu-themes";
 import MenuPreview from "@/components/MenuPreview";
 import LanguageSettings from "@/components/LanguageSettings";
 import TranslationManager from "@/components/TranslationManager";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 const RestaurantForm = () => {
   const { id } = useParams();
@@ -25,7 +26,7 @@ const RestaurantForm = () => {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [showLogo, setShowLogo] = useState(true);
   const [globalImageUrl, setGlobalImageUrl] = useState<string | null>(null);
-  const [theme, setTheme] = useState<MenuTheme>("default");
+  const [theme, setTheme] = useState<MenuTheme>("simple");
   const [enabledLanguages, setEnabledLanguages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -211,24 +212,8 @@ const RestaurantForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/dashboard">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div className="flex items-center gap-2">
-            <QrCode className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold text-foreground font-serif">
-              {isEditing ? "Restaurant bewerken" : "Nieuw restaurant"}
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
+    <DashboardLayout title={isEditing ? "Restaurant bewerken" : "Nieuw restaurant"}>
+      <div className="p-6 max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-[1fr,320px] gap-8">
           <div className="space-y-6">
             <Card>
@@ -475,8 +460,8 @@ const RestaurantForm = () => {
             )}
           </DialogContent>
         </Dialog>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

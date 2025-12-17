@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Edit2, Trash2, QrCode, Settings, Eye, Menu, Globe } from "lucide-react";
+import { Plus, Edit2, Trash2, Settings, Eye, Menu, Globe } from "lucide-react";
 import TranslationManager from "@/components/TranslationManager";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 interface Restaurant {
   id: string;
@@ -154,47 +155,17 @@ const MenuList = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <DashboardLayout title={`Menu's`}>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to={`/dashboard/restaurant/${restaurantId}`}>
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <div className="flex items-center gap-2">
-              <QrCode className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold text-foreground font-serif">
-                Menu's: {restaurant?.name}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link to={`/menu/${restaurant?.slug}`} target="_blank">
-              <Button variant="outline" size="sm">
-                <Eye className="mr-2 h-4 w-4" />
-                Bekijk
-              </Button>
-            </Link>
-            <Link to={`/dashboard/restaurant/${restaurantId}/qr`}>
-              <Button size="sm">
-                <QrCode className="mr-2 h-4 w-4" />
-                QR-code
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+    <DashboardLayout title={`Menu's: ${restaurant?.name || ''}`}>
+      <div className="p-6 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold font-serif">Menu's beheren</h1>
@@ -202,10 +173,18 @@ const MenuList = () => {
               Maak verschillende menu's aan, zoals Lunch, Diner of Drankkaart
             </p>
           </div>
-          <Button onClick={() => openMenuDialog()}>
-            <Plus className="mr-2 h-4 w-4" />
-            Menu toevoegen
-          </Button>
+          <div className="flex gap-2">
+            <Link to={`/menu/${restaurant?.slug}`} target="_blank">
+              <Button variant="outline" size="sm">
+                <Eye className="mr-2 h-4 w-4" />
+                Bekijk
+              </Button>
+            </Link>
+            <Button onClick={() => openMenuDialog()}>
+              <Plus className="mr-2 h-4 w-4" />
+              Menu toevoegen
+            </Button>
+          </div>
         </div>
 
         {menus.length === 0 ? (
@@ -341,8 +320,8 @@ const MenuList = () => {
             )}
           </DialogContent>
         </Dialog>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
