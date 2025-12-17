@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Download, QrCode as QrCodeIcon, Copy, ExternalLink } from "lucide-react";
+import { Download, QrCode as QrCodeIcon, Copy, ExternalLink } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 interface Restaurant {
   id: string;
@@ -89,31 +90,17 @@ const QRCode = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <DashboardLayout title="QR-code">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to={`/dashboard/restaurant/${restaurantId}`}>
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div className="flex items-center gap-2">
-            <QrCodeIcon className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold text-foreground font-serif">
-              QR-code: {restaurant?.name}
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
+    <DashboardLayout title={`QR-code: ${restaurant?.name || ''}`}>
+      <div className="p-6 max-w-2xl mx-auto">
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="font-serif text-2xl">QR-code voor {restaurant?.name}</CardTitle>
@@ -181,8 +168,8 @@ const QRCode = () => {
             </div>
           </CardContent>
         </Card>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 

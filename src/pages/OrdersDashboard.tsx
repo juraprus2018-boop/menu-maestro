@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Clock, Phone, MapPin, User, RefreshCw, Settings, Lock, Loader2 } from "lucide-react";
+import { Clock, Phone, MapPin, User, RefreshCw, Settings, Lock, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { hasOrderingSubscription } from "@/lib/subscription-tiers";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
 interface Order {
   id: string;
@@ -81,7 +82,6 @@ const OrdersDashboard = () => {
       const { data, error } = await supabase.functions.invoke("check-subscription");
       if (error) throw error;
       
-      // Check if user has ordering subscription either via product_ids array or main product_id
       const productIds = data?.product_ids || [];
       const mainProductId = data?.product_id;
       const hasOrderingViaArray = hasOrderingSubscription(productIds);
@@ -104,7 +104,6 @@ const OrdersDashboard = () => {
     }
   }, [restaurantId, statusFilter, hasOrdering, checkingSubscription]);
 
-  // Realtime subscription for new orders
   useEffect(() => {
     if (!restaurantId) return;
 
@@ -163,7 +162,6 @@ const OrdersDashboard = () => {
       if (error) throw error;
       setOrders(data || []);
 
-      // Fetch items for all orders
       if (data && data.length > 0) {
         const orderIds = data.map((o) => o.id);
         const { data: items } = await supabase
@@ -236,24 +234,18 @@ const OrdersDashboard = () => {
 
   if (checkingSubscription) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      <DashboardLayout title="Bestellingen">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </DashboardLayout>
     );
   }
 
   if (!hasOrdering) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="bg-card border-b border-border">
-          <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(`/dashboard/restaurant/${restaurantId}`)}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl font-bold font-serif text-primary">Bestellingen</h1>
-          </div>
-        </header>
-        <main className="container mx-auto px-4 py-12 max-w-lg">
+      <DashboardLayout title="Bestellingen">
+        <div className="p-6 max-w-lg mx-auto">
           <Card>
             <CardHeader className="text-center">
               <Lock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -268,21 +260,16 @@ const OrdersDashboard = () => {
               </Button>
             </CardContent>
           </Card>
-        </main>
-      </div>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-border sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(`/dashboard/restaurant/${restaurantId}`)}>
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl font-bold font-serif text-primary">Bestellingen</h1>
-          </div>
+    <DashboardLayout title="Bestellingen">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold font-serif">Bestellingen</h1>
           <div className="flex items-center gap-2">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
@@ -309,9 +296,7 @@ const OrdersDashboard = () => {
             </Button>
           </div>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-6">
         {loading ? (
           <div className="text-center py-12"><Loader2 className="h-8 w-8 animate-spin mx-auto" /></div>
         ) : orders.length === 0 ? (
@@ -413,8 +398,8 @@ const OrdersDashboard = () => {
             ))}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
