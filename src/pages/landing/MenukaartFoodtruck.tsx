@@ -54,7 +54,7 @@ const config: LandingPageConfig = {
     "Ideaal voor festivals"
   ],
   ctaTitle: "Uw foodtruck digitaal?",
-  ctaSubtitle: "Start vandaag nog. Eerste 30 dagen gratis, daarna vanaf €9/maand."
+  ctaSubtitle: "Start vandaag nog gratis. Geen creditcard nodig."
 };
 
 const MenukaartFoodtruck = () => <LandingPageTemplate config={config} />;

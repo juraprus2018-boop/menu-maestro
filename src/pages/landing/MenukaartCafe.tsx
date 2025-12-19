@@ -54,7 +54,7 @@ const config: LandingPageConfig = {
     "Makkelijk te onderhouden"
   ],
   ctaTitle: "Uw café digitaal?",
-  ctaSubtitle: "Start vandaag nog. 30 dagen gratis, daarna vanaf €9/maand."
+  ctaSubtitle: "Start vandaag nog gratis. Geen creditcard nodig."
 };
 
 const MenukaartCafe = () => <LandingPageTemplate config={config} />;

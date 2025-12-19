@@ -54,7 +54,7 @@ const config: LandingPageConfig = {
     "Geen verouderde papieren menu's"
   ],
   ctaTitle: "Uw frituur digitaal?",
-  ctaSubtitle: "Start vandaag nog. 30 dagen gratis, daarna vanaf €9/maand."
+  ctaSubtitle: "Start vandaag nog gratis. Geen creditcard nodig."
 };
 
 const MenukaartFrituur = () => <LandingPageTemplate config={config} />;

@@ -114,7 +114,7 @@ const LandingPageTemplate = ({ config }: LandingPageTemplateProps) => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth?mode=signup">
                 <Button size="lg" className="w-full sm:w-auto">
-                  Start gratis proefperiode
+                  Start gratis
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -186,16 +186,20 @@ const LandingPageTemplate = ({ config }: LandingPageTemplateProps) => {
         <div className="container mx-auto px-4">
           <div className="max-w-xl mx-auto text-center">
             <h2 className="text-3xl font-bold font-serif mb-4">
-              Simpele prijzen
+              Gratis digitale menukaart
             </h2>
             <Card className="border-primary">
               <CardContent className="p-8">
-                <div className="text-4xl font-bold text-primary mb-2">€9/maand</div>
-                <p className="text-muted-foreground mb-6">of €95/jaar (bespaar €13)</p>
+                <div className="text-4xl font-bold text-primary mb-2">Gratis</div>
+                <p className="text-muted-foreground mb-6">Start direct, geen creditcard nodig</p>
                 <ul className="space-y-3 text-left mb-8">
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-primary" />
-                    Onbeperkt menu's aanmaken
+                    1 restaurant
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary" />
+                    1 menukaart
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-primary" />
@@ -203,28 +207,24 @@ const LandingPageTemplate = ({ config }: LandingPageTemplateProps) => {
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-primary" />
+                    Onbeperkt categorieën & gerechten
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary" />
                     Allergenen beheer
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-primary" />
-                    Eigen logo en thema
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-primary" />
-                    30 dagen gratis proberen
                   </li>
                 </ul>
                 <Link to="/auth?mode=signup">
                   <Button className="w-full" size="lg">
-                    Start gratis proefperiode
+                    Start gratis
                   </Button>
                 </Link>
               </CardContent>
             </Card>
             <p className="text-sm text-muted-foreground mt-4">
-              Bekijk alle mogelijkheden op onze{" "}
+              Meer nodig? Bekijk onze{" "}
               <Link to="/prijzen" className="text-primary hover:underline">
-                prijzenpagina
+                Pro en Bestellen pakketten
               </Link>
             </p>
           </div>
@@ -238,11 +238,11 @@ const LandingPageTemplate = ({ config }: LandingPageTemplateProps) => {
             {config.ctaTitle || "Klaar om te starten?"}
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            {config.ctaSubtitle || "Probeer 30 dagen gratis. Geen creditcard nodig."}
+            {config.ctaSubtitle || "Start gratis, geen creditcard nodig."}
           </p>
           <Link to="/auth?mode=signup">
             <Button size="lg" variant="secondary">
-              Start gratis proefperiode
+              Start gratis
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>

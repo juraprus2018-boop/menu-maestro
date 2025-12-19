@@ -41,32 +41,22 @@ export const SUBSCRIPTION_TIERS = {
 } as const;
 
 export const PLANS = {
-  pro_monthly: {
-    tier: "pro" as const,
-    name: "Pro Maandelijks",
-    price: 14.95,
-    priceId: "price_1Sb3ONLmpOLDgj0kTNKRYjNy",
-    productId: "prod_TY9h8WNr3r36TZ",
-    interval: "maand",
-    description: "Onbeperkt restaurants en talen",
-  },
   pro_yearly: {
     tier: "pro" as const,
     name: "Pro Jaarlijks",
-    price: 149,
+    price: 150,
     priceId: "price_1Sb3OkLmpOLDgj0knvpeq4Rk",
     productId: "prod_TY9iuwNnHskHUB",
     interval: "jaar",
-    description: "Bespaar 17%",
-    savings: "Bespaar €30",
+    description: "4 talen, onbeperkt restaurants & menu's",
   },
-  ordering_monthly: {
+  ordering_yearly: {
     tier: "ordering" as const,
-    name: "Bestellen Maandelijks",
-    price: 29.50,
+    name: "Bestellen Jaarlijks",
+    price: 450,
     priceId: "price_1Sb4JmLmpOLDgj0kJJo4LAHj",
     productId: "prod_TYAfzP0Dw0QUCD",
-    interval: "maand",
+    interval: "jaar",
     description: "Alles van Pro + online bestellingen",
   },
 };

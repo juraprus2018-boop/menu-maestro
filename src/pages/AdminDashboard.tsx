@@ -125,8 +125,8 @@ const AdminDashboard = () => {
 
     try {
       const productId = tier === "pro" 
-        ? PLANS.pro_monthly.productId 
-        : PLANS.ordering_monthly.productId;
+        ? PLANS.pro_yearly.productId 
+        : PLANS.ordering_yearly.productId;
 
       if (adminSubscriptions[tier]) {
         // Remove subscription

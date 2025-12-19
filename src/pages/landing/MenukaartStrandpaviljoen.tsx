@@ -54,7 +54,7 @@ const config: LandingPageConfig = {
     "Perfect voor drukke zomerdagen"
   ],
   ctaTitle: "Klaar voor het seizoen?",
-  ctaSubtitle: "Start nu en wees klaar voor de zomer. 30 dagen gratis proberen."
+  ctaSubtitle: "Start gratis en wees klaar voor de zomer."
 };
 
 const MenukaartStrandpaviljoen = () => <LandingPageTemplate config={config} />;
