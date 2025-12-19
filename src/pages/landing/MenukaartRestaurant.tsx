@@ -54,7 +54,7 @@ const config: LandingPageConfig = {
     "Gasten kunnen direct bestellen (optioneel)"
   ],
   ctaTitle: "Uw restaurant digitaal?",
-  ctaSubtitle: "Start vandaag nog met uw digitale menukaart. 30 dagen gratis proberen."
+  ctaSubtitle: "Start vandaag nog gratis met uw digitale menukaart."
 };
 
 const MenukaartRestaurant = () => <LandingPageTemplate config={config} />;

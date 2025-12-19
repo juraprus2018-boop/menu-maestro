@@ -130,13 +130,13 @@ export default function SubscriptionDashboard() {
     {
       title: "Pro",
       tier: "pro" as const,
-      plans: [PLANS.pro_monthly, PLANS.pro_yearly],
+      plans: [PLANS.pro_yearly],
       features: SUBSCRIPTION_TIERS.pro.features,
     },
     {
       title: "Bestellen",
       tier: "ordering" as const,
-      plans: [PLANS.ordering_monthly],
+      plans: [PLANS.ordering_yearly],
       features: SUBSCRIPTION_TIERS.ordering.features,
     },
   ];

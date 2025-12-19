@@ -54,7 +54,7 @@ const config: LandingPageConfig = {
     "Gasten kunnen vooraf kiezen"
   ],
   ctaTitle: "Uw lunchroom digitaal?",
-  ctaSubtitle: "Probeer 30 dagen gratis. Ideaal voor de moderne lunchroom."
+  ctaSubtitle: "Start gratis. Ideaal voor de moderne lunchroom."
 };
 
 const MenukaartLunchroom = () => <LandingPageTemplate config={config} />;

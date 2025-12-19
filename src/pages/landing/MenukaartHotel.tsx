@@ -54,7 +54,7 @@ const config: LandingPageConfig = {
     "Bespaar op drukkosten en vertalingen"
   ],
   ctaTitle: "Uw hotel digitaal uitrusten?",
-  ctaSubtitle: "Probeer 30 dagen gratis. Ideaal voor hotels die service willen verbeteren."
+  ctaSubtitle: "Start gratis. Ideaal voor hotels die service willen verbeteren."
 };
 
 const MenukaartHotel = () => <LandingPageTemplate config={config} />;

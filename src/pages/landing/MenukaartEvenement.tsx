@@ -54,7 +54,7 @@ const config: LandingPageConfig = {
     "Herbruikbaar voor volgende evenementen"
   ],
   ctaTitle: "Uw event professioneel cateren?",
-  ctaSubtitle: "Probeer 30 dagen gratis. Perfect voor uw volgende evenement."
+  ctaSubtitle: "Start gratis. Perfect voor uw volgende evenement."
 };
 
 const MenukaartEvenement = () => <LandingPageTemplate config={config} />;
