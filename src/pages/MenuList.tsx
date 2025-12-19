@@ -7,10 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit2, Trash2, Settings, Eye, Menu, Globe } from "lucide-react";
+import { Plus, Edit2, Trash2, Settings, Eye, Menu, Globe, AlertCircle } from "lucide-react";
 import TranslationManager from "@/components/TranslationManager";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
 
 interface Restaurant {
   id: string;
@@ -33,7 +35,9 @@ const MenuList = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [menus, setMenus] = useState<MenuType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canAddMenu, setCanAddMenu] = useState(true);
   const { toast } = useToast();
+  const { canCreateMenu, tier, maxMenusPerRestaurant, loading: limitsLoading } = useSubscriptionLimits();
 
   // Menu form
   const [menuDialogOpen, setMenuDialogOpen] = useState(false);
@@ -52,9 +56,22 @@ const MenuList = () => {
     setTranslationDialogOpen(true);
   };
 
+  const checkMenuLimit = async () => {
+    if (restaurantId) {
+      const allowed = await canCreateMenu(restaurantId);
+      setCanAddMenu(allowed);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [restaurantId]);
+
+  useEffect(() => {
+    if (!limitsLoading && restaurantId) {
+      checkMenuLimit();
+    }
+  }, [limitsLoading, restaurantId, menus.length]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -87,12 +104,22 @@ const MenuList = () => {
     setLoading(false);
   };
 
-  const openMenuDialog = (menu?: MenuType) => {
+  const openMenuDialog = async (menu?: MenuType) => {
     if (menu) {
       setEditingMenu(menu);
       setMenuName(menu.name);
       setMenuDescription(menu.description || "");
+      setMenuDialogOpen(true);
     } else {
+      // Check limit before allowing to add
+      if (!canAddMenu) {
+        toast({
+          title: "Limiet bereikt",
+          description: "Upgrade naar Pro voor onbeperkt menu's.",
+          variant: "destructive",
+        });
+        return;
+      }
       setEditingMenu(null);
       setMenuName("");
       setMenuDescription("");
@@ -132,6 +159,7 @@ const MenuList = () => {
       } else {
         toast({ title: "Menu toegevoegd" });
         fetchData();
+        checkMenuLimit();
       }
     }
     setMenuDialogOpen(false);
@@ -180,12 +208,33 @@ const MenuList = () => {
                 Bekijk
               </Button>
             </Link>
-            <Button onClick={() => openMenuDialog()}>
-              <Plus className="mr-2 h-4 w-4" />
-              Menu toevoegen
-            </Button>
+            {canAddMenu ? (
+              <Button onClick={() => openMenuDialog()}>
+                <Plus className="mr-2 h-4 w-4" />
+                Menu toevoegen
+              </Button>
+            ) : (
+              <Link to="/prijzen">
+                <Button variant="outline">
+                  Upgrade voor meer menu's
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
+
+        {!limitsLoading && tier === "free" && !canAddMenu && (
+          <Alert className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Je gratis pakket is beperkt tot {maxMenusPerRestaurant} menu per restaurant.{" "}
+              <Link to="/prijzen" className="font-medium underline">
+                Upgrade naar Pro
+              </Link>{" "}
+              voor onbeperkt menu's.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {menus.length === 0 ? (
           <Card className="text-center py-12">

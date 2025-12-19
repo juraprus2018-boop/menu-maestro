@@ -9,13 +9,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Menu, Palette, Globe, ShoppingBag, ImageIcon } from "lucide-react";
+import { Loader2, Upload, Menu, Palette, Globe, ShoppingBag, ImageIcon, AlertCircle } from "lucide-react";
 import { themes, MenuTheme } from "@/lib/menu-themes";
 import MenuPreview from "@/components/MenuPreview";
 import LanguageSettings from "@/components/LanguageSettings";
 import TranslationManager from "@/components/TranslationManager";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
 
 const RestaurantForm = () => {
   const { id } = useParams();
@@ -34,14 +36,22 @@ const RestaurantForm = () => {
   const [translationDialogOpen, setTranslationDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { canCreateRestaurant, tier, maxRestaurants, loading: limitsLoading } = useSubscriptionLimits();
 
   const hasMultipleLanguages = enabledLanguages.filter(l => l !== "nl").length > 0;
 
   useEffect(() => {
     if (isEditing) {
       fetchRestaurant();
+    } else if (!limitsLoading && !canCreateRestaurant) {
+      toast({
+        title: "Limiet bereikt",
+        description: "Upgrade naar Pro voor onbeperkt restaurants.",
+        variant: "destructive",
+      });
+      navigate("/dashboard");
     }
-  }, [id]);
+  }, [id, limitsLoading, canCreateRestaurant]);
 
   const fetchRestaurant = async () => {
     const { data, error } = await supabase
@@ -210,6 +220,26 @@ const RestaurantForm = () => {
     }
     setLoading(false);
   };
+
+  // Redirect if trying to create but at limit
+  if (!isEditing && !limitsLoading && !canCreateRestaurant) {
+    return (
+      <DashboardLayout title="Nieuw restaurant">
+        <div className="p-6 max-w-4xl mx-auto">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Je gratis pakket is beperkt tot {maxRestaurants} restaurant.{" "}
+              <Link to="/prijzen" className="font-medium underline">
+                Upgrade naar Pro
+              </Link>{" "}
+              voor onbeperkt restaurants.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title={isEditing ? "Restaurant bewerken" : "Nieuw restaurant"}>

@@ -3,10 +3,12 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Store, Menu, Settings, QrCode, ShoppingBag, Eye } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Plus, Store, Menu, Settings, QrCode, ShoppingBag, Eye, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
 
 interface Restaurant {
   id: string;
@@ -22,6 +24,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
+  const { canCreateRestaurant, tier, maxRestaurants, loading: limitsLoading } = useSubscriptionLimits();
 
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
@@ -90,13 +93,34 @@ const Dashboard = () => {
               Beheer uw restaurants en digitale menukaarten
             </p>
           </div>
-          <Link to="/dashboard/restaurant/new">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Nieuw restaurant
-            </Button>
-          </Link>
+          {canCreateRestaurant ? (
+            <Link to="/dashboard/restaurant/new">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Nieuw restaurant
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/prijzen">
+              <Button variant="outline">
+                Upgrade voor meer restaurants
+              </Button>
+            </Link>
+          )}
         </div>
+
+        {!limitsLoading && tier === "free" && !canCreateRestaurant && (
+          <Alert className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Je gratis pakket is beperkt tot {maxRestaurants} restaurant.{" "}
+              <Link to="/prijzen" className="font-medium underline">
+                Upgrade naar Pro
+              </Link>{" "}
+              voor onbeperkt restaurants en menu's.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
