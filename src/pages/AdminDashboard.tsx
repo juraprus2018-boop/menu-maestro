@@ -47,8 +47,8 @@ const AdminDashboard = () => {
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [adminSubscriptions, setAdminSubscriptions] = useState<{basic: boolean, pro: boolean, ordering: boolean}>({
-    basic: false,
+  const [adminSubscriptions, setAdminSubscriptions] = useState<{free: boolean, pro: boolean, ordering: boolean}>({
+    free: true,
     pro: false,
     ordering: false,
   });
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
       const activeProductIds = subs?.map(s => s.plan) || [];
       
       setAdminSubscriptions({
-        basic: activeProductIds.some(id => SUBSCRIPTION_TIERS.basic.productIds.includes(id as any)),
+        free: true, // Everyone has free tier
         pro: activeProductIds.some(id => SUBSCRIPTION_TIERS.pro.productIds.includes(id as any)),
         ordering: activeProductIds.some(id => SUBSCRIPTION_TIERS.ordering.productIds.includes(id as any)),
       });
@@ -118,16 +118,15 @@ const AdminDashboard = () => {
     }
   };
 
-  const toggleAdminSubscription = async (tier: "basic" | "pro" | "ordering") => {
+  const toggleAdminSubscription = async (tier: "free" | "pro" | "ordering") => {
     if (!currentUserId) return;
+    if (tier === "free") return; // Can't toggle free tier
     setSavingAdminSub(true);
 
     try {
-      const productId = tier === "basic" 
-        ? PLANS.basic_monthly.productId 
-        : tier === "pro" 
-          ? PLANS.pro_monthly.productId 
-          : PLANS.ordering_monthly.productId;
+      const productId = tier === "pro" 
+        ? PLANS.pro_monthly.productId 
+        : PLANS.ordering_monthly.productId;
 
       if (adminSubscriptions[tier]) {
         // Remove subscription
@@ -299,13 +298,12 @@ const AdminDashboard = () => {
             <div className="flex flex-wrap gap-6">
               <div className="flex items-center space-x-2">
                 <Checkbox 
-                  id="admin-basic" 
-                  checked={adminSubscriptions.basic}
-                  onCheckedChange={() => toggleAdminSubscription("basic")}
-                  disabled={savingAdminSub}
+                  id="admin-free" 
+                  checked={adminSubscriptions.free}
+                  disabled={true}
                 />
-                <label htmlFor="admin-basic" className="text-sm font-medium cursor-pointer">
-                  Basis (€9/maand)
+                <label htmlFor="admin-free" className="text-sm font-medium cursor-pointer">
+                  Gratis (altijd inbegrepen)
                 </label>
               </div>
               <div className="flex items-center space-x-2">

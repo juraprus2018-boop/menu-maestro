@@ -121,10 +121,11 @@ export default function SubscriptionDashboard() {
 
   const planGroups = [
     {
-      title: "Basis",
-      tier: "basic" as const,
-      plans: [PLANS.basic_monthly, PLANS.basic_yearly],
-      features: SUBSCRIPTION_TIERS.basic.features,
+      title: "Gratis",
+      tier: "free" as const,
+      plans: [],
+      features: SUBSCRIPTION_TIERS.free.features,
+      isFree: true,
     },
     {
       title: "Pro",
@@ -224,7 +225,7 @@ export default function SubscriptionDashboard() {
                     )}
                   </div>
                   <CardDescription>
-                    {group.tier === "basic" && "Voor kleine horecazaken"}
+                    {group.tier === "free" && "Altijd gratis te gebruiken"}
                     {group.tier === "pro" && "Inclusief meertalige menu's"}
                     {group.tier === "ordering" && "Complete besteloplossing"}
                   </CardDescription>

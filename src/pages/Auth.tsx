@@ -186,7 +186,7 @@ const Auth = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO 
         title={isSignUp ? "Account aanmaken" : "Inloggen"}
-        description="Log in of maak een account aan om uw digitale menukaart te beheren. Start direct met 30 dagen gratis uitproberen."
+        description="Log in of maak een gratis account aan om uw digitale menukaart te beheren."
         canonicalUrl="/auth"
       />
       <nav className="border-b border-border bg-card/80 backdrop-blur-sm">
