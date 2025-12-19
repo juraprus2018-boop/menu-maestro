@@ -1,33 +1,35 @@
 // Subscription tier configuration
 export const SUBSCRIPTION_TIERS = {
-  basic: {
-    name: "Basis",
-    productIds: ["prod_TY8YjSp56UfCvH", "prod_TY8YRqbGHQQEL0"],
+  free: {
+    name: "Gratis",
+    productIds: [] as string[],
     features: [
-      "Onbeperkt menu's aanmaken",
-      "QR-codes genereren",
-      "Meerdere templates",
+      "1 restaurant",
+      "1 menukaart",
+      "1 taal (Nederlands)",
+      "QR-code genereren",
       "Real-time aanpassingen",
-      "Onbeperkt categorieën",
-      "Afbeeldingen uploaden",
+      "Onbeperkt categorieën & gerechten",
     ],
   },
   pro: {
     name: "Pro",
     productIds: ["prod_TY9h8WNr3r36TZ", "prod_TY9iuwNnHskHUB"],
     features: [
-      "Alles van Basis",
-      "Meertalige menu's (NL, EN, DE, FR)",
+      "Onbeperkt restaurants",
+      "Onbeperkt menukaarten",
+      "4 talen (NL, EN, DE, FR)",
       "Vertalingen beheren",
       "Taalkeuzeschakelaar voor gasten",
+      "QR-codes genereren",
+      "Afbeeldingen uploaden",
     ],
   },
   ordering: {
     name: "Bestellen",
     productIds: ["prod_TYAfzP0Dw0QUCD"],
     features: [
-      "Alles van Basis & Pro",
-      "Meertalige menu's (NL, EN, DE, FR)",
+      "Alles van Pro",
       "Online bestellingen ontvangen",
       "Afhalen & bezorging",
       "Bestellingendashboard",
@@ -39,25 +41,6 @@ export const SUBSCRIPTION_TIERS = {
 } as const;
 
 export const PLANS = {
-  basic_monthly: {
-    tier: "basic" as const,
-    name: "Basis Maandelijks",
-    price: 9,
-    priceId: "price_1Sb2GyLmpOLDgj0k9mSaNNtE",
-    productId: "prod_TY8YjSp56UfCvH",
-    interval: "maand",
-    description: "Flexibel en maandelijks opzegbaar",
-  },
-  basic_yearly: {
-    tier: "basic" as const,
-    name: "Basis Jaarlijks",
-    price: 95,
-    priceId: "price_1Sb2HKLmpOLDgj0kedsYM3Pe",
-    productId: "prod_TY8YRqbGHQQEL0",
-    interval: "jaar",
-    description: "Bespaar 12%",
-    savings: "Bespaar €13",
-  },
   pro_monthly: {
     tier: "pro" as const,
     name: "Pro Maandelijks",
@@ -65,7 +48,7 @@ export const PLANS = {
     priceId: "price_1Sb3ONLmpOLDgj0kTNKRYjNy",
     productId: "prod_TY9h8WNr3r36TZ",
     interval: "maand",
-    description: "Inclusief meertalige menu's",
+    description: "Onbeperkt restaurants en talen",
   },
   pro_yearly: {
     tier: "pro" as const,
@@ -84,8 +67,7 @@ export const PLANS = {
     priceId: "price_1Sb4JmLmpOLDgj0kJJo4LAHj",
     productId: "prod_TYAfzP0Dw0QUCD",
     interval: "maand",
-    description: "Extra module voor online bestellingen",
-    isAddon: true,
+    description: "Alles van Pro + online bestellingen",
   },
 };
 
@@ -97,14 +79,13 @@ export const SUPPORTED_LANGUAGES = [
 ] as const;
 
 export type LanguageCode = typeof SUPPORTED_LANGUAGES[number]["code"];
-export type SubscriptionTier = "basic" | "pro" | "ordering" | null;
+export type SubscriptionTier = "free" | "pro" | "ordering" | null;
 
 export function getTierFromProductId(productId: string | null): SubscriptionTier {
-  if (!productId) return null;
+  if (!productId) return "free";
   if (SUBSCRIPTION_TIERS.ordering.productIds.includes(productId as any)) return "ordering";
   if (SUBSCRIPTION_TIERS.pro.productIds.includes(productId as any)) return "pro";
-  if (SUBSCRIPTION_TIERS.basic.productIds.includes(productId as any)) return "basic";
-  return null;
+  return "free";
 }
 
 export function hasOrderingSubscription(productIds: string[]): boolean {

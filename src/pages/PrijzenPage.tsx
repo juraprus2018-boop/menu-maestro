@@ -12,7 +12,7 @@ const PrijzenPage = () => {
     <div className="min-h-screen bg-background">
       <SEO 
         title="Prijzen"
-        description="Bekijk de transparante prijzen van onze digitale menukaart. Vanaf €9/maand. Start met 30 dagen gratis uitproberen."
+        description="Bekijk de transparante prijzen van onze digitale menukaart. Gratis starten, upgrade wanneer je wilt."
         canonicalUrl="/prijzen"
       />
       <Navbar />
@@ -20,12 +20,12 @@ const PrijzenPage = () => {
       {/* Header */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-transparent to-accent/20">
         <div className="container mx-auto px-4 text-center">
-          <Badge className="mb-4">Transparante prijzen</Badge>
+          <Badge className="mb-4">Gratis digitale menukaart</Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 font-serif">
             Prijzen
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Kies het pakket dat bij uw restaurant past. Start altijd met 30 dagen gratis.
+            Start gratis en upgrade wanneer je meer nodig hebt.
           </p>
         </div>
       </section>
@@ -34,22 +34,30 @@ const PrijzenPage = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Basic */}
-            <Card>
+            {/* Free */}
+            <Card className="border-primary border-2">
               <CardHeader>
-                <CardTitle>Basic</CardTitle>
-                <p className="text-muted-foreground">Digitale menukaart</p>
+                <Badge className="w-fit mb-2 bg-primary">Gratis</Badge>
+                <CardTitle>Starter</CardTitle>
+                <p className="text-muted-foreground">Perfect om te starten</p>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
-                  <div className="text-4xl font-bold text-foreground">€9</div>
-                  <p className="text-muted-foreground">/maand</p>
-                  <p className="text-sm text-muted-foreground mt-1">of €95/jaar (bespaar €13)</p>
+                  <div className="text-4xl font-bold text-foreground">€0</div>
+                  <p className="text-muted-foreground">voor altijd</p>
                 </div>
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3 text-sm">
                     <Check className="h-4 w-4 text-primary" />
-                    Onbeperkt menu's
+                    1 restaurant
+                  </li>
+                  <li className="flex items-center gap-3 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    1 menukaart
+                  </li>
+                  <li className="flex items-center gap-3 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    1 taal (Nederlands)
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <Check className="h-4 w-4 text-primary" />
@@ -57,33 +65,25 @@ const PrijzenPage = () => {
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <Check className="h-4 w-4 text-primary" />
-                    Allergenen beheer
-                  </li>
-                  <li className="flex items-center gap-3 text-sm">
-                    <Check className="h-4 w-4 text-primary" />
-                    Eigen logo & thema
-                  </li>
-                  <li className="flex items-center gap-3 text-sm">
-                    <Check className="h-4 w-4 text-primary" />
-                    Direct aanpassen
+                    Onbeperkt gerechten
                   </li>
                 </ul>
                 <Link to="/auth?mode=signup">
-                  <Button variant="outline" className="w-full">
-                    Start gratis proefperiode
+                  <Button className="w-full">
+                    Gratis registreren
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
             {/* Pro */}
-            <Card className="border-primary relative">
+            <Card className="relative">
               <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 Populair
               </Badge>
               <CardHeader>
                 <CardTitle>Pro</CardTitle>
-                <p className="text-muted-foreground">Menu + meerdere talen</p>
+                <p className="text-muted-foreground">Meerdere talen & restaurants</p>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
@@ -94,34 +94,34 @@ const PrijzenPage = () => {
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3 text-sm">
                     <Check className="h-4 w-4 text-primary" />
-                    Alles van Basic
+                    Onbeperkt restaurants
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <Check className="h-4 w-4 text-primary" />
-                    Meerdere talen (NL, EN, DE, FR)
+                    Onbeperkt menukaarten
+                  </li>
+                  <li className="flex items-center gap-3 text-sm">
+                    <Check className="h-4 w-4 text-primary" />
+                    4 talen (NL, EN, DE, FR)
                   </li>
                   <li className="flex items-center gap-3 text-sm">
                     <Check className="h-4 w-4 text-primary" />
                     Vertalingen beheren
                   </li>
-                  <li className="flex items-center gap-3 text-sm">
-                    <Check className="h-4 w-4 text-primary" />
-                    Taalkeuze voor gasten
-                  </li>
                 </ul>
                 <Link to="/auth?mode=signup">
                   <Button className="w-full">
-                    Start gratis proefperiode
+                    Gratis registreren
                   </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Premium */}
+            {/* Bestellen */}
             <Card className="border-primary/50 bg-primary/5">
               <CardHeader>
-                <CardTitle>Premium</CardTitle>
-                <p className="text-muted-foreground">Menu + online bestellen</p>
+                <CardTitle>Bestellen</CardTitle>
+                <p className="text-muted-foreground">Online bestellingen</p>
               </CardHeader>
               <CardContent>
                 <div className="mb-6">
@@ -150,14 +150,10 @@ const PrijzenPage = () => {
                     <Check className="h-4 w-4 text-primary" />
                     Bestellingendashboard
                   </li>
-                  <li className="flex items-center gap-3 text-sm">
-                    <Check className="h-4 w-4 text-primary" />
-                    E-mail notificaties
-                  </li>
                 </ul>
                 <Link to="/auth?mode=signup">
                   <Button className="w-full">
-                    Start gratis proefperiode
+                    Gratis registreren
                   </Button>
                 </Link>
               </CardContent>
@@ -177,7 +173,7 @@ const PrijzenPage = () => {
               <div>
                 <h3 className="font-semibold mb-2">Is er een proefperiode?</h3>
                 <p className="text-muted-foreground">
-                  Ja, u kunt 30 dagen gratis alle functies uitproberen. Geen creditcard nodig.
+                  U kunt gratis starten met 1 restaurant en 1 menukaart. Geen creditcard nodig.
                 </p>
               </div>
               <div>
@@ -215,14 +211,14 @@ const PrijzenPage = () => {
       <section className="py-20 bg-primary">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-primary-foreground font-serif mb-4">
-            Start vandaag nog
+            Start vandaag nog gratis
           </h2>
           <p className="text-primary-foreground/80 mb-8">
-            30 dagen gratis. Geen creditcard nodig. Annuleer wanneer u wilt.
+            Gratis digitale menukaart. Upgrade wanneer je wilt.
           </p>
           <Link to="/auth?mode=signup">
             <Button size="lg" variant="secondary">
-              Start gratis proefperiode
+              Gratis registreren
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>

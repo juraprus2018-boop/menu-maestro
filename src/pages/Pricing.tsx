@@ -110,10 +110,11 @@ const Pricing = () => {
   };
 
   const getCurrentPlanKey = (): string | null => {
-    if (!subscription?.subscribed) return null;
+    if (!subscription?.subscribed || subscription.tier === "free") return null;
     const interval = subscription.plan === "yearly" ? "yearly" : "monthly";
+    if (subscription.tier === "ordering") return "ordering_monthly";
     if (subscription.tier === "pro") return `pro_${interval}`;
-    return `basic_${interval}`;
+    return null;
   };
 
   const currentPlanKey = getCurrentPlanKey();
@@ -122,7 +123,7 @@ const Pricing = () => {
     <div className="min-h-screen bg-background">
       <SEO 
         title="Abonnement kiezen"
-        description="Kies het abonnement dat bij uw restaurant past. Vanaf €9/maand voor een digitale menukaart. 30 dagen gratis uitproberen."
+        description="Kies het abonnement dat bij uw restaurant past. Gratis digitale menukaart bij registratie."
         canonicalUrl="/pricing"
       />
       <header className="bg-card border-b border-border">
@@ -137,12 +138,12 @@ const Pricing = () => {
       <main className="container mx-auto px-4 py-12">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold font-serif mb-4">
-            Kies het abonnement dat bij jou past
+            Gratis digitale menukaart
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            {subscription?.subscribed 
-              ? `Je hebt momenteel een ${subscription.tier === "pro" ? "Pro" : "Basis"} abonnement.`
-              : "Probeer 30 dagen gratis, daarna kies je het abonnement dat bij jou past."}
+            {subscription?.subscribed && subscription.tier !== "free"
+              ? `Je hebt momenteel een ${subscription.tier === "ordering" ? "Bestellen" : "Pro"} abonnement.`
+              : "Registreer gratis en start direct met je digitale menukaart. Upgrade wanneer je meer nodig hebt."}
           </p>
         </div>
 
@@ -152,6 +153,52 @@ const Pricing = () => {
           </div>
         ) : (
           <>
+            {/* Free Tier Card */}
+            <div className="max-w-md mx-auto mb-12">
+              <Card className={`relative ${subscription?.tier === "free" ? "ring-2 ring-primary" : ""}`}>
+                {subscription?.tier === "free" && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
+                    Jouw huidige plan
+                  </Badge>
+                )}
+                <CardHeader className="text-center">
+                  <CardTitle className="font-serif text-2xl">Gratis</CardTitle>
+                  <CardDescription>Perfect om te starten</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-6 text-center">
+                    <span className="text-5xl font-bold">€0</span>
+                    <span className="text-muted-foreground">/voor altijd</span>
+                  </div>
+                  <ul className="space-y-3">
+                    {SUBSCRIPTION_TIERS.free.features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-2">
+                        <Check className="h-5 w-5 text-primary" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  {user ? (
+                    <Button className="w-full" variant="outline" disabled>
+                      <Check className="h-4 w-4 mr-2" />
+                      Inbegrepen bij registratie
+                    </Button>
+                  ) : (
+                    <Button className="w-full" onClick={() => navigate("/auth?mode=signup")}>
+                      Gratis registreren
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            </div>
+
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold font-serif mb-2">Meer nodig?</h3>
+              <p className="text-muted-foreground">Upgrade voor meer talen, restaurants en functionaliteiten</p>
+            </div>
+
             <Tabs value={billingInterval} onValueChange={(v) => setBillingInterval(v as "monthly" | "yearly")} className="max-w-5xl mx-auto">
               <div className="flex justify-center mb-8">
                 <TabsList>
@@ -162,52 +209,12 @@ const Pricing = () => {
 
               <TabsContent value="monthly" className="mt-0">
                 <div className="grid md:grid-cols-2 gap-8">
-                  {/* Basic Monthly */}
-                  <Card className={`relative ${currentPlanKey === "basic_monthly" ? "ring-2 ring-primary" : ""}`}>
-                    {currentPlanKey === "basic_monthly" && (
-                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        Huidig abonnement
-                      </Badge>
-                    )}
-                    <CardHeader>
-                      <CardTitle className="font-serif">Basis</CardTitle>
-                      <CardDescription>{PLANS.basic_monthly.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-6">
-                        <span className="text-4xl font-bold">€{PLANS.basic_monthly.price}</span>
-                        <span className="text-muted-foreground">/{PLANS.basic_monthly.interval}</span>
-                      </div>
-                      <ul className="space-y-3">
-                        {SUBSCRIPTION_TIERS.basic.features.map((feature) => (
-                          <li key={feature} className="flex items-center gap-2">
-                            <Check className="h-5 w-5 text-primary" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                    <CardFooter>
-                      {currentPlanKey === "basic_monthly" ? (
-                        <Button className="w-full" variant="outline" onClick={handleManageSubscription} disabled={loading === "manage"}>
-                          {loading === "manage" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
-                          Beheer abonnement
-                        </Button>
-                      ) : (
-                        <Button className="w-full" onClick={() => handleSubscribe("basic_monthly")} disabled={loading === "basic_monthly" || subscription?.subscribed}>
-                          {loading === "basic_monthly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                          {subscription?.subscribed ? "Al geabonneerd" : "Kies Basis"}
-                        </Button>
-                      )}
-                    </CardFooter>
-                  </Card>
-
                   {/* Pro Monthly */}
                   <Card className={`relative border-primary ${currentPlanKey === "pro_monthly" ? "ring-2 ring-primary" : ""}`}>
                     {currentPlanKey === "pro_monthly" ? (
                       <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Huidig abonnement</Badge>
                     ) : (
-                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">Aanbevolen</Badge>
+                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">Populair</Badge>
                     )}
                     <CardHeader>
                       <CardTitle className="font-serif flex items-center gap-2">
@@ -238,7 +245,48 @@ const Pricing = () => {
                       ) : (
                         <Button className="w-full" onClick={() => handleSubscribe("pro_monthly")} disabled={loading === "pro_monthly"}>
                           {loading === "pro_monthly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                          {subscription?.tier === "basic" ? "Upgrade naar Pro" : "Kies Pro"}
+                          {subscription?.tier === "free" ? "Upgrade naar Pro" : "Kies Pro"}
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+
+                  {/* Ordering Monthly */}
+                  <Card className={`relative ${currentPlanKey === "ordering_monthly" ? "ring-2 ring-primary" : ""}`}>
+                    {currentPlanKey === "ordering_monthly" && (
+                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Huidig abonnement</Badge>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="font-serif flex items-center gap-2">
+                        <ShoppingBag className="h-5 w-5 text-primary" />
+                        Bestellen
+                      </CardTitle>
+                      <CardDescription>{PLANS.ordering_monthly.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="mb-6">
+                        <span className="text-4xl font-bold">€{PLANS.ordering_monthly.price.toFixed(2).replace(".", ",")}</span>
+                        <span className="text-muted-foreground">/{PLANS.ordering_monthly.interval}</span>
+                      </div>
+                      <ul className="space-y-3">
+                        {SUBSCRIPTION_TIERS.ordering.features.map((feature) => (
+                          <li key={feature} className="flex items-center gap-2">
+                            <Check className="h-5 w-5 text-primary" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                    <CardFooter>
+                      {subscription?.hasOrdering ? (
+                        <Button className="w-full" variant="outline" onClick={handleManageSubscription} disabled={loading === "manage"}>
+                          {loading === "manage" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
+                          Beheer abonnement
+                        </Button>
+                      ) : (
+                        <Button className="w-full" onClick={() => handleSubscribe("ordering_monthly")} disabled={loading === "ordering_monthly"}>
+                          {loading === "ordering_monthly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                          Kies Bestellen
                         </Button>
                       )}
                     </CardFooter>
@@ -248,47 +296,6 @@ const Pricing = () => {
 
               <TabsContent value="yearly" className="mt-0">
                 <div className="grid md:grid-cols-2 gap-8">
-                  {/* Basic Yearly */}
-                  <Card className={`relative ${currentPlanKey === "basic_yearly" ? "ring-2 ring-primary" : ""}`}>
-                    {currentPlanKey === "basic_yearly" && (
-                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Huidig abonnement</Badge>
-                    )}
-                    <CardHeader>
-                      <CardTitle className="font-serif">Basis</CardTitle>
-                      <CardDescription>{PLANS.basic_yearly.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-6">
-                        <span className="text-4xl font-bold">€{PLANS.basic_yearly.price}</span>
-                        <span className="text-muted-foreground">/{PLANS.basic_yearly.interval}</span>
-                        {PLANS.basic_yearly.savings && (
-                          <Badge variant="secondary" className="ml-2">{PLANS.basic_yearly.savings}</Badge>
-                        )}
-                      </div>
-                      <ul className="space-y-3">
-                        {SUBSCRIPTION_TIERS.basic.features.map((feature) => (
-                          <li key={feature} className="flex items-center gap-2">
-                            <Check className="h-5 w-5 text-primary" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                    <CardFooter>
-                      {currentPlanKey === "basic_yearly" ? (
-                        <Button className="w-full" variant="outline" onClick={handleManageSubscription} disabled={loading === "manage"}>
-                          {loading === "manage" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
-                          Beheer abonnement
-                        </Button>
-                      ) : (
-                        <Button className="w-full" onClick={() => handleSubscribe("basic_yearly")} disabled={loading === "basic_yearly" || subscription?.subscribed}>
-                          {loading === "basic_yearly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                          {subscription?.subscribed ? "Al geabonneerd" : "Kies Basis Jaar"}
-                        </Button>
-                      )}
-                    </CardFooter>
-                  </Card>
-
                   {/* Pro Yearly */}
                   <Card className={`relative border-primary ${currentPlanKey === "pro_yearly" ? "ring-2 ring-primary" : ""}`}>
                     {currentPlanKey === "pro_yearly" ? (
@@ -328,7 +335,48 @@ const Pricing = () => {
                       ) : (
                         <Button className="w-full" onClick={() => handleSubscribe("pro_yearly")} disabled={loading === "pro_yearly"}>
                           {loading === "pro_yearly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                          {subscription?.tier === "basic" ? "Upgrade naar Pro" : "Kies Pro Jaar"}
+                          {subscription?.tier === "free" ? "Upgrade naar Pro" : "Kies Pro Jaar"}
+                        </Button>
+                      )}
+                    </CardFooter>
+                  </Card>
+
+                  {/* Ordering (no yearly option) */}
+                  <Card className={`relative ${subscription?.hasOrdering ? "ring-2 ring-primary" : ""}`}>
+                    {subscription?.hasOrdering && (
+                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Huidig abonnement</Badge>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="font-serif flex items-center gap-2">
+                        <ShoppingBag className="h-5 w-5 text-primary" />
+                        Bestellen
+                      </CardTitle>
+                      <CardDescription>Alleen maandelijks beschikbaar</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="mb-6">
+                        <span className="text-4xl font-bold">€{PLANS.ordering_monthly.price.toFixed(2).replace(".", ",")}</span>
+                        <span className="text-muted-foreground">/maand</span>
+                      </div>
+                      <ul className="space-y-3">
+                        {SUBSCRIPTION_TIERS.ordering.features.map((feature) => (
+                          <li key={feature} className="flex items-center gap-2">
+                            <Check className="h-5 w-5 text-primary" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                    <CardFooter>
+                      {subscription?.hasOrdering ? (
+                        <Button className="w-full" variant="outline" onClick={handleManageSubscription} disabled={loading === "manage"}>
+                          {loading === "manage" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
+                          Beheer abonnement
+                        </Button>
+                      ) : (
+                        <Button className="w-full" onClick={() => handleSubscribe("ordering_monthly")} disabled={loading === "ordering_monthly"}>
+                          {loading === "ordering_monthly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                          Kies Bestellen
                         </Button>
                       )}
                     </CardFooter>
@@ -336,66 +384,6 @@ const Pricing = () => {
                 </div>
               </TabsContent>
             </Tabs>
-
-            {/* Ordering Tier */}
-            <div className="max-w-2xl mx-auto mt-12">
-              <h3 className="text-2xl font-bold font-serif text-center mb-6">Compleet pakket</h3>
-              <Card className={`relative ${subscription?.hasOrdering ? "ring-2 ring-primary" : ""}`}>
-                {subscription?.hasOrdering && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Huidig abonnement</Badge>
-                )}
-                <CardHeader>
-                  <CardTitle className="font-serif flex items-center gap-2">
-                    <ShoppingBag className="h-5 w-5 text-primary" />
-                    Bestellen
-                  </CardTitle>
-                  <CardDescription>Alles van Basis + Pro + online bestellingen</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold">€{PLANS.ordering_monthly.price.toFixed(2).replace(".", ",")}</span>
-                    <span className="text-muted-foreground">/maand</span>
-                  </div>
-                  <ul className="space-y-3">
-                    {SUBSCRIPTION_TIERS.basic.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <Check className="h-5 w-5 text-primary" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                    {SUBSCRIPTION_TIERS.pro.features.filter(f => f !== "Alles van Basis").map((feature) => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <Check className="h-5 w-5 text-primary" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                    {SUBSCRIPTION_TIERS.ordering.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <Check className="h-5 w-5 text-primary" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  {subscription?.hasOrdering ? (
-                    <Button className="w-full" variant="outline" onClick={handleManageSubscription} disabled={loading === "manage"}>
-                      {loading === "manage" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
-                      Beheer abonnement
-                    </Button>
-                  ) : (
-                    <Button 
-                      className="w-full" 
-                      onClick={() => handleSubscribe("ordering_monthly")} 
-                      disabled={loading === "ordering_monthly"}
-                    >
-                      {loading === "ordering_monthly" && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                      Kies Bestellen
-                    </Button>
-                  )}
-                </CardFooter>
-              </Card>
-            </div>
 
             <div className="text-center mt-12">
               <p className="text-muted-foreground">
